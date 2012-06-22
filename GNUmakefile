@@ -17,7 +17,7 @@ else
 	gtestarchive:=$(gtestdir).zip
 endif
 
-.SILENT:
+###XXX .SILENT:
 .PHONY: test manual install clean distclean help ### all
 .DEFAULT: all
 all::
@@ -25,11 +25,12 @@ all::
 # bootstrap without installed ninja!
 bootstrap.py: ;
 ninja.bootstrap: bootstrap.py
+	ls -lrtd --full-time
 	if [ ! -d $(gtestdir) ] ; then \
 	  if [ ! -f $(gtestarchive) ] ; then \
-	    wget --no-verbose http://googletest.googlecode.com/files/$(gtestarchive); \
+	    wget --verbose http://googletest.googlecode.com/files/$(gtestarchive); \
 	  fi; \
-	  unzip -qo $(gtestarchive); \
+	  unzip -o $(gtestarchive); \
 	fi
 	$(RM) build.ninja
 	./$<
@@ -91,7 +92,8 @@ clean: build.ninja
 distclean: clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
-		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html
+		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html \
+		ninja.bootstrap
 	git status --ignored --short
 
 install: ninja
