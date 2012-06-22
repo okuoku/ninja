@@ -17,7 +17,7 @@ else
 	gtestarchive:=$(gtestdir).zip
 endif
 
-###XXX .SILENT:
+.SILENT:
 .PHONY: test manual install clean distclean help ### all
 .DEFAULT: all
 all::
@@ -64,6 +64,9 @@ src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
 src/lexer.in.cc: ;
 src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
+else
+src/depfile_parser.cc: ;
+src/lexer.cc: ;
 endif
 
 test:: ninja_test
@@ -85,7 +88,7 @@ clean: build.ninja
 	rm -rf build/*.o build.ninja
 ###	-./ninja -t clean
 
-distclean: ###XXX clean
+distclean: clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
 		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html
