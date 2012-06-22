@@ -7,7 +7,15 @@ bindir:=$(prefix)/bin
 libdir:=$(prefix)/lib
 includedir:=$(prefix)/include
 
-gtestdir:=$(shell $(bindir)/grealpath $(HOME)/Workspace/cpp/gtest-1.6.0)
+HOSTNAME:=$(shell hostname)
+ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+	gtestdir:=$(shell $(bindir)/grealpath $(HOME)/Workspace/cpp/gtest-1.6.0)
+	CXX:=$(prefix)/libexec/ccache/g++
+else
+	CXX:=g++
+	gtestdir:=gtest-1.6.0
+	gtestarchive:=$(gtestdir).zip
+endif
 
 ###XXX .SILENT:
 .PHONY: test manual install clean distclean help ### all
@@ -17,12 +25,20 @@ all::
 # bootstrap without installed ninja!
 bootstrap.py: ;
 ninja.bootstrap: bootstrap.py
+	if [ ! -d $(gtestdir) ] ; then \
+	  if [ ! -f $(gtestarchive) ] ; then \
+	    wget --no-verbose http://googletest.googlecode.com/files/$(gtestarchive); \
+	  fi; \
+	  unzip -qo $(gtestarchive); \
+	fi
+	$(RM) build.ninja
 	./$<
 	cp -p -n ninja $@
+	$(MAKE) build.ninja -B
 
 # bootstrap with install ninja!
 ninja: ninja.bootstrap build.ninja
-	./$<
+	./$< -v
 
 manual:: README.html
 README.html: README HACKING GNUmakefile $(bindir)/rst2html-2.7.py
@@ -37,7 +53,7 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
 	CFLAGS='-Wsign-compare -Wconversion -Wpointer-arith -Wcomment -Wcast-align -Wcast-qual' \
 	LDFLAGS="-L$(libdir)" \
-	CXX="$(prefix)/libexec/ccache/g++" ./configure.py --debug --with-gtest=$(gtestdir)
+	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
 
 src/depfile_parser.in.cc: ;
 src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
@@ -56,14 +72,14 @@ test:: parser_perftest
 test:: build_log_perftest
 	./$<
 
-test:: hash_collision_bench
+bench:: hash_collision_bench
 	./$<
 
 help: ninja
 	./ninja -t targets
 
 clean: build.ninja
-	rm -rf build/*.o ###XXX build.ninja
+	rm -rf build/*.o build.ninja
 ###	-./ninja -t clean
 
 distclean: ###XXX clean
