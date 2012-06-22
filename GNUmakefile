@@ -55,6 +55,8 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	LDFLAGS="-L$(libdir)" \
 	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
 
+
+ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
 src/depfile_parser.in.cc: ;
 src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
@@ -62,6 +64,7 @@ src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
 src/lexer.in.cc: ;
 src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
+endif
 
 test:: ninja_test
 	./$<
