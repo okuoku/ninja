@@ -19,7 +19,7 @@ Build Dependencies:
 Adjusting build flags and use `ccache`_ at `build.ninja`::
 
   CFLAGS=-O3 CXX='/opt/local/bin/ccache g++' ./configure.py \
-    --with-gtest=../gtest-1.6.0
+    --with-gtest=./gtest-1.6.0
 
 and rebuild.
 

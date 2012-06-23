@@ -25,8 +25,8 @@ You may install it yourself with::
   sudo install ninja /usr/local/bin
 
 
-HACKING
+HACKING :)
 ==================
 
-.. include:: HACKING :)
+.. include:: HACKING
 
