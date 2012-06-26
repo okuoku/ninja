@@ -34,7 +34,7 @@ ninja.bootstrap: bootstrap.py
 	fi
 	$(RM) build.ninja
 	./$<
-	cp -p -n ninja $@
+	cp -p -b ninja $@
 	$(MAKE) build.ninja -B
 
 # bootstrap with install ninja!
@@ -94,7 +94,7 @@ distclean: clean
 	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
 		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html \
 		ninja.bootstrap
-	git status --ignored --short
+	-git status --ignored --short
 
 install: ninja
 	install ninja $(bindir)
