@@ -94,7 +94,7 @@ objext = '.o'
 if platform == 'windows':
     CXX = 'cl'
     objext = '.obj'
-if platform == 'mysys':
+elif platform in ('mysys', 'mingw'):
     objext = '.obj'
 
 def src(filename):
@@ -200,14 +200,16 @@ if host == 'windows':
            description='LIB $out')
 elif host == 'mingw':
     n.rule('ar',
-           command='cmd /c $ar cqs $out.tmp $in && move /Y $out.tmp $out',
-           description='AR $out')
+           command='cmd /c $ar cqs $out.tmp @$out.rsp && move /Y $out.tmp $out',
+           description='AR $out',
+	       rspfile='$out.rsp',
+	       rspfile_content='$in')
 elif host == 'mysys':
     n.rule('ar',
            command='sh -c "rm -f $out && $ar crs $out @$out.rsp"',
            description='AR $out',
-	   rspfile='$out.rsp',
-	   rspfile_content='$in')
+	       rspfile='$out.rsp',
+	       rspfile_content='$in')
 else:
     n.rule('ar',
            command='rm -f $out && $ar crs $out $in',
@@ -309,7 +311,7 @@ if options.with_gtest:
     gtest_all_incs = '-I%s -I%s' % (path, '/'.join([path, 'include']))
     if platform == 'windows':
         gtest_cflags = '/nologo /EHsc ' + gtest_all_incs
-    elif platform == 'mysys':
+    elif platform in ('mysys', 'mingw'):
         gtest_cflags = '-Wno-undef ' + gtest_all_incs   # too many warnings with gtest
     else:
         gtest_cflags = '-fvisibility=hidden -Wno-undef ' + gtest_all_incs   # too many warnings with gtest
