@@ -144,7 +144,7 @@ bool Edge::RecomputeOutputDirty(BuildLog* build_log,
         return true;
       }
     } else {
-      EXPLAIN("output %s older than most recent input %s (%" PRIx64 " vs %" PRIx64 ")",
+      EXPLAIN("output %s older than most recent input %s (%016" PRIx64 " vs %016" PRIx64 ")",
           output->path().c_str(),
           most_recent_node ? most_recent_node->path().c_str() : "",
           output->mtime(), most_recent_input);
@@ -355,7 +355,7 @@ bool Edge::is_phony() const {
 }
 
 void Node::Dump(const char* prefix) const {
-    printf("%s <%s 0x%p> mtime: %d%s, (:%s), ",
+    printf("%s <%s 0x%p> mtime: %" PRIx64 "%s, (:%s), ",
            prefix, path().c_str(), this,
            mtime(), mtime()?"":" (:missing)",
            dirty()?" dirty":" clean");
