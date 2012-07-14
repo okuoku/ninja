@@ -746,7 +746,6 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
              i != edge->inputs_.end() - edge->order_only_deps_; ++i) {
           TimeStamp input_mtime = disk_interface_->Stat((*i)->path());
           if (input_mtime > restat_mtime) {
-          if (input_mtime > restat_mtime)
             restat_mtime = input_mtime;
             printf("XXX newer input '%s' of cleaned node '%s' found\n",
                     (*i)->path().c_str(), output.c_str());
