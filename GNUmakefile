@@ -35,7 +35,7 @@ ninja.bootstrap: bootstrap.py
 	$(RM) build.ninja
 	./$<
 	cp -p -b ninja $@
-	$(MAKE) build.ninja -B
+	-$(RM) build.ninja
 
 # bootstrap with install ninja!
 ninja: ninja.bootstrap build.ninja
@@ -86,10 +86,9 @@ help: ninja
 	./ninja -t targets
 
 clean: build.ninja
-	rm -rf build/*.o build.ninja
-###	-./ninja -t clean
+	-$(RM) build/*.o ###XXX build.ninja
 
-distclean: clean
+distclean: ###XXX clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
 		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html \

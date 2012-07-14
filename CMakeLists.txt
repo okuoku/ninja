@@ -41,7 +41,7 @@ macro(ninja_option_list)
     endforeach()
 endmacro()
 
-ninja_option(platform        "target platform (linux/windows)"       OFF)
+ninja_option(platform        "target platform (unix/windows)"        OFF)
 ninja_option(compiler        "compiler (default/clang)"              OFF)
 ninja_option(debug           "enable debugging flags"                OFF)
 ninja_option(verbose         "verbose output while building"         OFF)
@@ -51,8 +51,8 @@ ninja_option(monolithic-test "build tests into one binary"           ON)
 if(platform)
     set(${platform} 1)
 elseif(UNIX)
-    message(STATUS "platform=linux")
-    set(linux 1)
+    message(STATUS "platform=unix")
+    set(unix 1)
 elseif(WIN32)
     message(STATUS "platform=windows")
     set(windows 1)
@@ -74,7 +74,7 @@ if(UNIX AND windows)
     set(CMAKE_C_COMPILER ${cross}-cc)
     set(CMAKE_CXX_COMPILER ${cross}-c++)
     set(CMAKE_RC_COMPILER ${cross}-windres)
-    set(CMAKE_FIND_ROOT_PATH /usr/${cross})
+    set(CMAKE_FIND_ROOT_PATH /usr/${cross}) ### TODO
 endif()
 
 if(compiler STREQUAL clang)
@@ -106,7 +106,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if(debug)
         set(cflags "${cflags} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC")
     endif()
-    if(linux)
+    if(unix)
         set(platformlibs pthread)
         set(cflags "${cflags} -fvisibility=hidden")
     elseif(windows)
@@ -143,12 +143,15 @@ set(ninja_lib
         ${srcdir}/graphviz.cc
         ${srcdir}/lexer.cc
         ${srcdir}/metrics.cc
-        ${srcdir}/parsers.cc
+        ${srcdir}/manifest_parser.cc
         ${srcdir}/state.cc
         ${srcdir}/util.cc)
 
-if(linux)
+if(unix)
     list(APPEND  ninja_lib ${srcdir}/subprocess.cc)
+    if(LINUX)
+        list(APPEND  ninja_lib ${srcdir}/clockgettime_linux.cc)
+    endif(LINUX)
 elseif(windows)
     list(APPEND ninja_lib ${srcdir}/getopt.c ${srcdir}/subprocess-win32.cc)
 endif()
@@ -182,7 +185,7 @@ endif (RE2C_EXECUTABLE)
 # see src/browse.py, src/inline.sh, .../bindir/concrete_inline.sh
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
-    if(linux)
+    if(unix)
         set(inline ${CMAKE_BINARY_DIR}/concrete_inline.sh)
         file(WRITE ${inline}
             "mkdir -p ${CMAKE_BINARY_DIR}/build
@@ -237,14 +240,21 @@ endif()
 if(gtest)
     enable_testing()
 
+    find_path (GTEST_INCLUDE_DIR "gtest/gtest.h" HINT "${gtest}/include" NO_DEFAULT_PATH )
+    if (GTEST_INCLUDE_DIR-NOTFOUND)
+        message(SEND_ERROR "gtest/gtest.h not found at '${gtest}/include'.")
+    else ()
+        get_filename_component(GTEST_ROOT_DIR ${GTEST_INCLUDE_DIR} PATH) # without include
+    endif ()
+
     macro(set_test_cflags target)
-        set(tflags "-DGTEST_HAS_PTHREAD=0 -I${gtest}/include")
-        set_target_properties(${target} PROPERTIES COMPILE_FLAGS "${tflags} -I${gtest}/include ${ARGN}")
+        set(tflags "-DGTEST_HAS_PTHREAD=0 -I${GTEST_INCLUDE_DIR}" )
+        set_target_properties(${target} PROPERTIES COMPILE_FLAGS "${tflags} -I${GTEST_INCLUDE_DIR} ${ARGN}")
     endmacro()
 
     # build gtest, test.cc only once
     add_library(testlib ${srcdir}/test.cc ${gtest}/src/gtest-all.cc ${gtest}/src/gtest_main.cc)
-    set_test_cflags(testlib -I${gtest})
+    set_test_cflags(testlib -I${GTEST_ROOT_DIR})
 
     # building a test is always the same
     macro(add_ninja_test test_name)
