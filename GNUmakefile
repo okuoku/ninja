@@ -32,6 +32,12 @@ ninja.bootstrap: bootstrap.py
 	  fi; \
 	  unzip -o $(gtestarchive); \
 	fi
+	if [ -d .git ]; then \
+	  branch=`git status -bsu no`; \
+	  revisioncount=`git log --oneline | wc -l`; \
+	  projectversion=`git describe --tags --long --always`; \
+	  echo "const char* kVersion = \"$${branch}-$${projectversion%%-*}\";" > src/version.h; \
+	fi
 	$(RM) build.ninja
 	./$<
 	cp -p -b ninja $@
@@ -39,7 +45,7 @@ ninja.bootstrap: bootstrap.py
 
 # bootstrap with install ninja!
 ninja: ninja.bootstrap build.ninja
-	./$< -v
+	./$<
 
 manual:: README.html
 README.html: README HACKING GNUmakefile $(bindir)/rst2html-2.7.py

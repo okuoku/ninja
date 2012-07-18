@@ -49,9 +49,8 @@
 
 namespace {
 
-/// The version number of the current Ninja release.  This will always
-/// be "git" on trunk.
-const char* kVersion = "git";
+/// The version number of the current Ninja release.
+#include "version.h"
 
 /// Global information passed into subtools.
 struct Globals {
