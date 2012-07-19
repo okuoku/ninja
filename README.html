@@ -588,12 +588,7 @@ ninja.bootstrap: bootstrap.py
           fi; \
           unzip -o $(gtestarchive); \
         fi
-        if [ -d .git ]; then \
-          branch=`git status -bsu no`; \
-          revisioncount=`git log --oneline | wc -l`; \
-          projectversion=`git describe --tags --long --always`; \
-          echo &quot;const char* kVersion = \&quot;$${branch}-$${projectversion%%-*}\&quot;;&quot; &gt; src/version.h; \
-        fi
+        src/version.sh
         $(RM) build.ninja
         ./$&lt;
         cp -p -b ninja $&#64;
