@@ -17,7 +17,7 @@ else
 	gtestarchive:=$(gtestdir).zip
 endif
 
-###XXX .SILENT:
+.SILENT:
 .PHONY: test manual install clean distclean help ### all
 .DEFAULT: all
 all::
@@ -32,12 +32,7 @@ ninja.bootstrap: bootstrap.py
 	  fi; \
 	  unzip -o $(gtestarchive); \
 	fi
-	if [ -d .git ]; then \
-	  branch=`git status -bsu no`; \
-	  revisioncount=`git log --oneline | wc -l`; \
-	  projectversion=`git describe --tags --long --always`; \
-	  echo "const char* kVersion = \"$${branch}-$${projectversion%%-*}\";" > src/version.h; \
-	fi
+	src/version.sh
 	$(RM) build.ninja
 	./$<
 	cp -p -b ninja $@
@@ -92,12 +87,12 @@ help: ninja
 	./ninja -t targets
 
 clean: build.ninja
-	-$(RM) build/*.o ###XXX build.ninja
+	-$(RM) build/*.o build.ninja
 
 distclean: ###XXX clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
-		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html \
+		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html \
 		ninja.bootstrap
 	-git status --ignored --short
 

@@ -1,4 +1,3 @@
-*.html
 *.diff
 *.rst
 *.orig
@@ -27,6 +26,6 @@ TAGS
 /doc/manual.html
 /doc/doxygen
 .DS_Store
-.*.swp
+/.*.swp
 .*~
 *~
