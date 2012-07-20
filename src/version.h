@@ -1,1 +1,1 @@
-const char* kVersion = "## develop-cce0d34";
+const char* kVersion = "## develop-5cc55a3";

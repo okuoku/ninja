@@ -69,7 +69,7 @@ endif()
 if(UNIX AND windows)
     set(CMAKE_SYSTEM_NAME Windows)
     if(NOT compiler)
-        set(cross i586-mingw32msvc)
+        set(cross i586-mingw32msvc) ### TODO
     endif()
     set(CMAKE_C_COMPILER ${cross}-cc)
     set(CMAKE_CXX_COMPILER ${cross}-c++)
@@ -83,7 +83,7 @@ if(compiler STREQUAL clang)
 endif()
 
 # this triggers  the compiler detection
-project(ninja)
+project(ninja CXX)
 
 if(verbose)
     set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -106,7 +106,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if(debug)
         set(cflags "${cflags} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC")
     endif()
-    if(unix)
+    if(unix AND NOT MINGW)
         set(platformlibs pthread)
         set(cflags "${cflags} -fvisibility=hidden")
     elseif(windows)
@@ -147,12 +147,12 @@ set(ninja_lib
         ${srcdir}/state.cc
         ${srcdir}/util.cc)
 
-if(unix)
+if(unix AND NOT MINGW)
     list(APPEND  ninja_lib ${srcdir}/subprocess.cc)
     if(LINUX)
         list(APPEND  ninja_lib ${srcdir}/clockgettime_linux.cc)
     endif(LINUX)
-elseif(windows)
+elseif(windows OR MINGW)
     list(APPEND ninja_lib ${srcdir}/getopt.c ${srcdir}/subprocess-win32.cc)
 endif()
 
@@ -185,7 +185,7 @@ endif (RE2C_EXECUTABLE)
 # see src/browse.py, src/inline.sh, .../bindir/concrete_inline.sh
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
-    if(unix)
+    if(unix AND NOT MINGW)
         set(inline ${CMAKE_BINARY_DIR}/concrete_inline.sh)
         file(WRITE ${inline}
             "mkdir -p ${CMAKE_BINARY_DIR}/build
