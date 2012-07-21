@@ -17,7 +17,7 @@ else
 	gtestarchive:=$(gtestdir).zip
 endif
 
-.SILENT:
+###XXX .SILENT:
 .PHONY: test manual install clean distclean help ### all
 .DEFAULT: all
 all::
@@ -42,8 +42,10 @@ ninja.bootstrap: bootstrap.py
 ninja: ninja.bootstrap build.ninja
 	./$<
 
+# gnerate docu
 manual:: README.html
-README.html: README HACKING GNUmakefile $(bindir)/rst2html-2.7.py
+	./ninja $@
+README.html: README.rst HACKING.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
 
 ###FIXME -Wundef not usable with gtest-1.6.0! ck
@@ -100,6 +102,8 @@ install: ninja
 	install ninja $(bindir)
 
 # NoOp rules for extern dependencies
+README.rst: ;
+HACKING.rst: ;
 GNUmakefile: ;
 $(bindir)/ninja: ;
 $(bindir)/re2c: ;

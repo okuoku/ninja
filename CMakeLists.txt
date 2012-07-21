@@ -83,7 +83,7 @@ if(compiler STREQUAL clang)
 endif()
 
 # this triggers  the compiler detection
-project(ninja CXX)
+project(ninja)
 
 if(verbose)
     set(CMAKE_VERBOSE_MAKEFILE ON)
