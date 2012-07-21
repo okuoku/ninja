@@ -1,1 +1,1 @@
-const char* kVersion = "## develop-3b1ac8e";
+const char* kVersion = "## feature/WriteConsoleOutput-d2227b8";
