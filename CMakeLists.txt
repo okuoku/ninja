@@ -69,7 +69,7 @@ endif()
 if(UNIX AND windows)
     set(CMAKE_SYSTEM_NAME Windows)
     if(NOT compiler)
-        set(cross i586-mingw32msvc)
+        set(cross i586-mingw32msvc) ### TODO
     endif()
     set(CMAKE_C_COMPILER ${cross}-cc)
     set(CMAKE_CXX_COMPILER ${cross}-c++)
@@ -82,8 +82,8 @@ if(compiler STREQUAL clang)
     set(CMAKE_CXX_COMPILER clang++)
 endif()
 
-# this triggers  the compiler detection
-project(ninja)
+# this triggers the compiler detection
+project(ninja CXX)
 
 if(verbose)
     set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -106,7 +106,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if(debug)
         set(cflags "${cflags} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC")
     endif()
-    if(unix)
+    if(unix AND NOT MINGW)
         set(platformlibs pthread)
         set(cflags "${cflags} -fvisibility=hidden")
     elseif(windows)
@@ -124,6 +124,9 @@ endif()
 set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS_INIT}   ${cflags}")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS_INIT} ${cflags}")
 
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/build)
+# Make sure the linker can find the library once it is built.
+link_directories(${LIBRARY_OUTPUT_PATH})
 
 
 #
@@ -147,12 +150,12 @@ set(ninja_lib
         ${srcdir}/state.cc
         ${srcdir}/util.cc)
 
-if(unix)
+if(unix AND NOT MINGW)
     list(APPEND  ninja_lib ${srcdir}/subprocess.cc)
     if(LINUX)
         list(APPEND  ninja_lib ${srcdir}/clockgettime_linux.cc)
     endif(LINUX)
-elseif(windows)
+elseif(windows OR MINGW)
     list(APPEND ninja_lib ${srcdir}/getopt.c ${srcdir}/subprocess-win32.cc)
 endif()
 
@@ -185,8 +188,8 @@ endif (RE2C_EXECUTABLE)
 # see src/browse.py, src/inline.sh, .../bindir/concrete_inline.sh
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
-    if(unix)
-        set(inline ${CMAKE_BINARY_DIR}/concrete_inline.sh)
+    if(unix AND NOT MINGW)
+        set(inline ${CMAKE_BINARY_DIR}/build/concrete_inline.sh)
         file(WRITE ${inline}
             "mkdir -p ${CMAKE_BINARY_DIR}/build
             ${srcdir}/inline.sh kBrowsePy < ${srcdir}/browse.py > ${CMAKE_BINARY_DIR}/build/browse_py.h\n")

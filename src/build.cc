@@ -19,10 +19,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#ifdef _WIN32
-//XXX see "subprocess.h" #include <windows.h>
-#else
-#include <unistd.h>
+#ifndef _WIN32
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #endif
@@ -729,9 +726,11 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
           // The rule command did not change the output.  Propagate the clean
           // state through the build graph.
           // Note that this also applies to nonexistent outputs (mtime == 0).
+#ifdef DEBUG
           if (new_mtime) {
             printf("XXX unchanged output '%s' found\n", (*i)->path().c_str());
           }
+#endif
           plan_.CleanNode(log_, *i);
           node_cleaned = true;
         } else {
@@ -747,8 +746,10 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
           TimeStamp input_mtime = disk_interface_->Stat((*i)->path());
           if (input_mtime > restat_mtime) {
             restat_mtime = input_mtime;
+#ifdef DEBUG
             printf("XXX newer input '%s' of cleaned node '%s' found\n",
                     (*i)->path().c_str(), output.c_str());
+#endif
           }
         }
 
@@ -756,8 +757,10 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
         if (restat_mtime != 0 && !edge->rule().depfile().empty()) {
           TimeStamp depfile_mtime = disk_interface_->Stat(edge->EvaluateDepFile());
           if (depfile_mtime > restat_mtime) {
+#ifdef DEBUG
             printf("XXX depfile is newer than most resent input of cleaned node '%s'\n",
                     output.c_str());
+#endif
             restat_mtime = depfile_mtime;
           }
         }

@@ -15,7 +15,7 @@
 // If _GNU_SOURCE is defined all the other features are turned on! ck
 #ifndef _GNU_SOURCE
 #define _GNU_SOURCE // needed for _LARGEFILE64_SOURCE, default on unix!
-//XXX #define _POSIX_C_SOURCE
+//XXX or sould we  #define _POSIX_C_SOURCE
 #endif
 
 #include "disk_interface.h"

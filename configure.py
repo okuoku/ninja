@@ -214,6 +214,13 @@ else:
     n.rule('ar',
            command='rm -f $out && $ar crs $out $in',
            description='AR $out')
+    n.newline()
+    n.rule('bumpversion',
+           command='sh -c src/version.sh',
+           description='Bump version $out',
+           restat=True,
+           generator=True)  #XXX prevent clean of generated files
+    n.build('src/version.h', 'bumpversion', src('version.sh'))
 n.newline()
 
 if platform == 'windows':
