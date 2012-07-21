@@ -175,7 +175,7 @@ in **Eclipse**, **NetBeans**, or **Visual Studio 2005**.
 Or you may always use a Makefile "stub" and import your project as a Makefile
 based project. Use a Makefile like this:
 
-.. include:: GNUmakefile
+.. include:: .Makefile
              :literal:
 
 
