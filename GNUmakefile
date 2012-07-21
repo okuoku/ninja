@@ -92,7 +92,7 @@ help: ninja
 	./ninja -t targets
 
 clean: build.ninja
-	-$(RM) build/*.o ###XXX build.ninja
+	-$(RM) build/*.o build.ninja
 
 distclean: ###XXX clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
