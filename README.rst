@@ -17,7 +17,7 @@ build systems in two major respects:
 
 .. note:: I have forked the orignal version to support `MINGW`_, `MSYS`_, and
           `CYGWIN`_ builds too.
-          
+
           **Ninja should be usable on most platforms as cmake do!**
 
           - My version support timestamps with **100ns resolution** insteads of
@@ -56,12 +56,12 @@ then re-builds *Ninja* using itself and `./build.ninja`.  You should end up
 with a *Ninja* binary in the source root.  Run `./ninja -h` for help.
 
 If you like to use `cmake`_ and `make`_ to bootstrap *Ninja* create a build dir
-and generate your build project:
+and generate your build project::
 
     mkdir -p build && cd build
     cmake  .. && make
     # or you have already ninja installed
-    cmake -G Ninja .. && ninja 
+    cmake -G Ninja .. && ninja
 
 You may also create a *Mac OSX Package Maker installer* with *cpack*::
 
@@ -100,9 +100,12 @@ When done, open a pull request to your feature branch.
 
 
 .. _`cmake`: http://cmake.org/
+.. _`cygwin`: http://www.cygwin.com/
 .. _`git-flow`: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/
 .. _`git`: http://git-scm.com/documentation/
 .. _`make`: http://www.gnu.org/software/make/make.html
+.. _`mingw`: http://mingw.org/
+.. _`msys`: http://mingw.org/wiki/MSYS/
 .. _`python`: http://python.org/
 
 
