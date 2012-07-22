@@ -19,10 +19,7 @@
 #include <iostream>
 #include <stdlib.h>
 
-#ifdef _WIN32
-//XXX see "subprocess.h" #include <windows.h>
-#else
-#include <unistd.h>
+#ifndef _WIN32
 #include <sys/ioctl.h>
 #include <sys/time.h>
 #endif
@@ -237,22 +234,36 @@ void BuildStatus::PrintStatus(Edge* edge) {
 #endif
   }
 
-  printf("%s", to_print.c_str());
-
   if (smart_terminal_ && !force_full_command) {
 #ifndef _WIN32
+    printf("%s", to_print.c_str());
     printf("\x1B[K");  // Clear to end of line.
     fflush(stdout);
     have_blank_line_ = false;
 #else
-    // Clear to end of line.
+    // We don't want to have the cursor spamming back and forth, so
+    // use WriteConsoleOutput instead which updates the contents of
+    // the buffer, but doesn't move the cursor position.
     GetConsoleScreenBufferInfo(console_, &csbi);
-    int num_spaces = csbi.dwSize.X - 1 - csbi.dwCursorPosition.X;
-    printf("%*s", num_spaces, "");
+    COORD buf_size = { csbi.dwSize.X, 1 };
+    COORD zero_zero = { 0, 0 };
+    SMALL_RECT target = { csbi.dwCursorPosition.X, csbi.dwCursorPosition.Y,
+                          csbi.dwCursorPosition.X + csbi.dwSize.X - 1,
+                          csbi.dwCursorPosition.Y };
+    CHAR_INFO* char_data = new CHAR_INFO[csbi.dwSize.X];
+    memset(char_data, 0, sizeof(CHAR_INFO) * csbi.dwSize.X);
+    for (int i = 0; i < csbi.dwSize.X; ++i) {
+      char_data[i].Char.AsciiChar = ' ';
+      char_data[i].Attributes = csbi.wAttributes;
+
+    }
+    for (size_t i = 0; i < to_print.size(); ++i)
+      char_data[i].Char.AsciiChar = to_print[i];
+    WriteConsoleOutput(console_, char_data, buf_size, zero_zero, &target);
     have_blank_line_ = false;
 #endif
   } else {
-    printf("\n");
+    printf("%s\n", to_print.c_str());
   }
 }
 
@@ -729,9 +740,11 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
           // The rule command did not change the output.  Propagate the clean
           // state through the build graph.
           // Note that this also applies to nonexistent outputs (mtime == 0).
+#ifdef DEBUG
           if (new_mtime) {
             printf("XXX unchanged output '%s' found\n", (*i)->path().c_str());
           }
+#endif
           plan_.CleanNode(log_, *i);
           node_cleaned = true;
         } else {
@@ -747,8 +760,10 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
           TimeStamp input_mtime = disk_interface_->Stat((*i)->path());
           if (input_mtime > restat_mtime) {
             restat_mtime = input_mtime;
+#ifdef DEBUG
             printf("XXX newer input '%s' of cleaned node '%s' found\n",
                     (*i)->path().c_str(), output.c_str());
+#endif
           }
         }
 
@@ -756,8 +771,10 @@ void Builder::FinishEdge(Edge* edge, bool success, const string& output) {
         if (restat_mtime != 0 && !edge->rule().depfile().empty()) {
           TimeStamp depfile_mtime = disk_interface_->Stat(edge->EvaluateDepFile());
           if (depfile_mtime > restat_mtime) {
+#ifdef DEBUG
             printf("XXX depfile is newer than most resent input of cleaned node '%s'\n",
                     output.c_str());
+#endif
             restat_mtime = depfile_mtime;
           }
         }

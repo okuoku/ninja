@@ -1,0 +1,744 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="Docutils 0.9.1: http://docutils.sourceforge.net/" />
+<title>Ninja</title>
+<style type="text/css">
+
+/*
+:Author: David Goodger (goodger@python.org)
+:Id: $Id: html4css1.css 7434 2012-05-11 21:06:27Z milde $
+:Copyright: This stylesheet has been placed in the public domain.
+
+Default cascading style sheet for the HTML output of Docutils.
+
+See http://docutils.sf.net/docs/howto/html-stylesheets.html for how to
+customize this style sheet.
+*/
+
+/* used to remove borders from tables and images */
+.borderless, table.borderless td, table.borderless th {
+  border: 0 }
+
+table.borderless td, table.borderless th {
+  /* Override padding for "table.docutils td" with "! important".
+     The right padding separates the table cells. */
+  padding: 0 0.5em 0 0 ! important }
+
+.first {
+  /* Override more specific margin styles with "! important". */
+  margin-top: 0 ! important }
+
+.last, .with-subtitle {
+  margin-bottom: 0 ! important }
+
+.hidden {
+  display: none }
+
+a.toc-backref {
+  text-decoration: none ;
+  color: black }
+
+blockquote.epigraph {
+  margin: 2em 5em ; }
+
+dl.docutils dd {
+  margin-bottom: 0.5em }
+
+object[type="image/svg+xml"], object[type="application/x-shockwave-flash"] {
+  overflow: hidden;
+}
+
+/* Uncomment (and remove this text!) to get bold-faced definition list terms
+dl.docutils dt {
+  font-weight: bold }
+*/
+
+div.abstract {
+  margin: 2em 5em }
+
+div.abstract p.topic-title {
+  font-weight: bold ;
+  text-align: center }
+
+div.admonition, div.attention, div.caution, div.danger, div.error,
+div.hint, div.important, div.note, div.tip, div.warning {
+  margin: 2em ;
+  border: medium outset ;
+  padding: 1em }
+
+div.admonition p.admonition-title, div.hint p.admonition-title,
+div.important p.admonition-title, div.note p.admonition-title,
+div.tip p.admonition-title {
+  font-weight: bold ;
+  font-family: sans-serif }
+
+div.attention p.admonition-title, div.caution p.admonition-title,
+div.danger p.admonition-title, div.error p.admonition-title,
+div.warning p.admonition-title {
+  color: red ;
+  font-weight: bold ;
+  font-family: sans-serif }
+
+/* Uncomment (and remove this text!) to get reduced vertical space in
+   compound paragraphs.
+div.compound .compound-first, div.compound .compound-middle {
+  margin-bottom: 0.5em }
+
+div.compound .compound-last, div.compound .compound-middle {
+  margin-top: 0.5em }
+*/
+
+div.dedication {
+  margin: 2em 5em ;
+  text-align: center ;
+  font-style: italic }
+
+div.dedication p.topic-title {
+  font-weight: bold ;
+  font-style: normal }
+
+div.figure {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+div.footer, div.header {
+  clear: both;
+  font-size: smaller }
+
+div.line-block {
+  display: block ;
+  margin-top: 1em ;
+  margin-bottom: 1em }
+
+div.line-block div.line-block {
+  margin-top: 0 ;
+  margin-bottom: 0 ;
+  margin-left: 1.5em }
+
+div.sidebar {
+  margin: 0 0 0.5em 1em ;
+  border: medium outset ;
+  padding: 1em ;
+  background-color: #ffffee ;
+  width: 40% ;
+  float: right ;
+  clear: right }
+
+div.sidebar p.rubric {
+  font-family: sans-serif ;
+  font-size: medium }
+
+div.system-messages {
+  margin: 5em }
+
+div.system-messages h1 {
+  color: red }
+
+div.system-message {
+  border: medium outset ;
+  padding: 1em }
+
+div.system-message p.system-message-title {
+  color: red ;
+  font-weight: bold }
+
+div.topic {
+  margin: 2em }
+
+h1.section-subtitle, h2.section-subtitle, h3.section-subtitle,
+h4.section-subtitle, h5.section-subtitle, h6.section-subtitle {
+  margin-top: 0.4em }
+
+h1.title {
+  text-align: center }
+
+h2.subtitle {
+  text-align: center }
+
+hr.docutils {
+  width: 75% }
+
+img.align-left, .figure.align-left, object.align-left {
+  clear: left ;
+  float: left ;
+  margin-right: 1em }
+
+img.align-right, .figure.align-right, object.align-right {
+  clear: right ;
+  float: right ;
+  margin-left: 1em }
+
+img.align-center, .figure.align-center, object.align-center {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.align-left {
+  text-align: left }
+
+.align-center {
+  clear: both ;
+  text-align: center }
+
+.align-right {
+  text-align: right }
+
+/* reset inner alignment in figures */
+div.align-right {
+  text-align: inherit }
+
+/* div.align-center * { */
+/*   text-align: left } */
+
+ol.simple, ul.simple {
+  margin-bottom: 1em }
+
+ol.arabic {
+  list-style: decimal }
+
+ol.loweralpha {
+  list-style: lower-alpha }
+
+ol.upperalpha {
+  list-style: upper-alpha }
+
+ol.lowerroman {
+  list-style: lower-roman }
+
+ol.upperroman {
+  list-style: upper-roman }
+
+p.attribution {
+  text-align: right ;
+  margin-left: 50% }
+
+p.caption {
+  font-style: italic }
+
+p.credits {
+  font-style: italic ;
+  font-size: smaller }
+
+p.label {
+  white-space: nowrap }
+
+p.rubric {
+  font-weight: bold ;
+  font-size: larger ;
+  color: maroon ;
+  text-align: center }
+
+p.sidebar-title {
+  font-family: sans-serif ;
+  font-weight: bold ;
+  font-size: larger }
+
+p.sidebar-subtitle {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+p.topic-title {
+  font-weight: bold }
+
+pre.address {
+  margin-bottom: 0 ;
+  margin-top: 0 ;
+  font: inherit }
+
+pre.literal-block, pre.doctest-block, pre.math, pre.code {
+  margin-left: 2em ;
+  margin-right: 2em }
+
+pre.code .ln { /* line numbers */
+  color: grey;
+}
+
+.code {
+  background-color: #eeeeee
+}
+
+span.classifier {
+  font-family: sans-serif ;
+  font-style: oblique }
+
+span.classifier-delimiter {
+  font-family: sans-serif ;
+  font-weight: bold }
+
+span.interpreted {
+  font-family: sans-serif }
+
+span.option {
+  white-space: nowrap }
+
+span.pre {
+  white-space: pre }
+
+span.problematic {
+  color: red }
+
+span.section-subtitle {
+  /* font-size relative to parent (h1..h6 element) */
+  font-size: 80% }
+
+table.citation {
+  border-left: solid 1px gray;
+  margin-left: 1px }
+
+table.docinfo {
+  margin: 2em 4em }
+
+table.docutils {
+  margin-top: 0.5em ;
+  margin-bottom: 0.5em }
+
+table.footnote {
+  border-left: solid 1px black;
+  margin-left: 1px }
+
+table.docutils td, table.docutils th,
+table.docinfo td, table.docinfo th {
+  padding-left: 0.5em ;
+  padding-right: 0.5em ;
+  vertical-align: top }
+
+table.docutils th.field-name, table.docinfo th.docinfo-name {
+  font-weight: bold ;
+  text-align: left ;
+  white-space: nowrap ;
+  padding-left: 0 }
+
+h1 tt.docutils, h2 tt.docutils, h3 tt.docutils,
+h4 tt.docutils, h5 tt.docutils, h6 tt.docutils {
+  font-size: 100% }
+
+ul.auto-toc {
+  list-style-type: none }
+
+</style>
+</head>
+<body>
+<div class="document" id="ninja">
+<h1 class="title">Ninja</h1>
+
+<p>Based on original version from <a class="reference external" href="http://martine.github.com/ninja/">http://martine.github.com/ninja/</a></p>
+<p><em>Ninja</em> is a small build system with a focus on speed. It differs from other
+build systems in two major respects:</p>
+<ul class="simple">
+<li>it is designed to have its input files generated by a higher-level build system,</li>
+<li>it is designed to run builds <strong>as fast as possible.</strong></li>
+</ul>
+<hr class="docutils" />
+<div class="contents topic" id="contents">
+<p class="topic-title first">Contents</p>
+<ul class="simple">
+<li><a class="reference internal" href="#building" id="id42">Building</a></li>
+<li><a class="reference internal" href="#contributing" id="id43">Contributing</a></li>
+<li><a class="reference internal" href="#hacking" id="id44">HACKING :)</a><ul>
+<li><a class="reference internal" href="#build-dependencies" id="id45">Build Dependencies:</a></li>
+<li><a class="reference internal" href="#test-driven-development" id="id46">Test-driven development:</a></li>
+<li><a class="reference internal" href="#testing-performance-impact-of-changes" id="id47">Testing performance impact of changes:</a></li>
+<li><a class="reference internal" href="#coding-guidelines" id="id48">Coding guidelines:</a></li>
+<li><a class="reference internal" href="#documentation-guidelines" id="id49">Documentation guidelines:</a></li>
+<li><a class="reference internal" href="#generating-the-manual" id="id50">Generating the manual:</a></li>
+<li><a class="reference internal" href="#windows-development-on-linux-this-is-kind-of-hacky-right-now" id="id51">Windows development on Linux (this is kind of hacky right now):</a></li>
+<li><a class="reference internal" href="#windows-development-on-windows" id="id52">Windows development on Windows:</a></li>
+<li><a class="reference internal" href="#using-clang" id="id53">Using clang :</a></li>
+<li><a class="reference internal" href="#using-ninja-with-an-ide" id="id54">Using Ninja with an IDE:</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<div class="note">
+<p class="first admonition-title">Note</p>
+<p>I have forked the orignal version to support <a class="reference external" href="http://mingw.org/">MINGW</a> <a class="footnote-reference" href="#id28" id="id29">[11]</a>, <a class="reference external" href="http://mingw.org/wiki/MSYS/">MSYS</a> <a class="footnote-reference" href="#id31" id="id32">[12]</a>, and
+<a class="reference external" href="http://www.cygwin.com/">CYGWIN</a> <a class="footnote-reference" href="#id11" id="id12">[5]</a> build too.</p>
+<ul class="simple">
+<li>My version support timestamps with <strong>100ns resolution</strong> insteads of
+only 1s.</li>
+<li>It contains a <em>GNUmakefile</em> and a <em>CMakeLists.txt</em> if you like to
+work <a class="reference internal" href="#using-ninja-with-an-ide">Using Ninja with an IDE:</a></li>
+<li><cite>ninja -V</cite> show you a distinguish version number if you build it
+yourself from develop branch.</li>
+<li>My <em>Nina</em> home page is <a class="reference external" href="http://clausklein.github.com/ninja/">http://clausklein.github.com/ninja/</a></li>
+</ul>
+<p class="last">Claus Klein</p>
+</div>
+<p>See the manual -- <a class="reference external" href="http://ClausKlein.github.com/ninja/doc/manual.html">http://ClausKlein.github.com/ninja/doc/manual.html</a> or
+<a class="reference external" href="doc/manual.html">doc/manual.asciidoc</a> included in the distribution -- for
+background and more details.</p>
+<p>Download the current <em>Ninja</em> source code as zip file from
+<a class="reference external" href="https://github.com/ClausKlein/ninja/zipball/develop">https://github.com/ClausKlein/ninja/zipball/develop</a></p>
+<p>Getting a source code version of <em>Ninja</em> with <a class="reference external" href="http://git-scm.com/documentation/">git</a> <a class="footnote-reference" href="#id21" id="id22">[9]</a> to work with:</p>
+<pre class="literal-block">
+git clone git://github.com/ClausKlein/ninja.git
+cd ninja
+make ninja
+</pre>
+<div class="section" id="building">
+<h1><a class="toc-backref" href="#id42">Building</a></h1>
+<p>To build, run <cite>python ./bootstrap.py</cite>.  It first blindly compiles all non-test
+source files together, then re-builds <em>Ninja</em> using itself and <cite>./build.ninja</cite>.
+You should end up with a <em>Ninja</em> binary in the source root.  Run <cite>./ninja -h</cite>
+for help.</p>
+<p>The only file of interest to a user is the resulting <em>Ninja</em> binary.</p>
+<p>You may install it yourself with:</p>
+<pre class="literal-block">
+sudo install ninja /usr/local/bin
+# or
+sudo make install
+</pre>
+</div>
+<div class="section" id="contributing">
+<h1><a class="toc-backref" href="#id43">Contributing</a></h1>
+<p>If you want to work with code, you should use <a class="reference external" href="http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/">git-flow</a> <a class="footnote-reference" href="#id18" id="id19">[8]</a> .
+Fork the repository. Then, run:</p>
+<pre class="literal-block">
+git clone --recursive git&#64;github.com:&lt;username&gt;/ninja.git
+git branch develop origin/develop
+git flow init -d
+git flow feature start &lt;your feature&gt;
+</pre>
+<p>Then, do work and commit your changes:</p>
+<pre class="literal-block">
+git flow feature publish &lt;your feature&gt;
+</pre>
+<p>When done, open a pull request to your feature branch.</p>
+</div>
+<div class="section" id="hacking">
+<h1><a class="toc-backref" href="#id44">HACKING :)</a></h1>
+<div class="section" id="build-dependencies">
+<h2><a class="toc-backref" href="#id45">Build Dependencies:</a></h2>
+<p><strong>Requiered</strong> packages:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://python.org/">python</a> <a class="footnote-reference" href="#id34" id="id35">[13]</a></li>
+<li><a class="reference external" href="http://re2c.sf.net/">re2c</a> <a class="footnote-reference" href="#id37" id="id38">[14]</a></li>
+</ul>
+<p><em>Recomended</em> packages to use:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://ccache.samba.org/">ccache</a> <a class="footnote-reference" href="#id4" id="id5">[2]</a></li>
+<li><a class="reference external" href="http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/">git-flow</a> <a class="footnote-reference" href="#id18" id="id20">[8]</a></li>
+<li><a class="reference external" href="http://docutils.sourceforge.net/">docutils</a> <a class="footnote-reference" href="#id13" id="id14">[6]</a></li>
+</ul>
+<p><em>Requiered packages for development</em> are:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://git-scm.com/documentation/">git</a> <a class="footnote-reference" href="#id21" id="id23">[9]</a></li>
+<li><a class="reference external" href="http://code.google.com/p/googletest/">gtest</a> <a class="footnote-reference" href="#id24" id="id25">[10]</a></li>
+<li><a class="reference external" href="http://www.doxygen.org/">doxygen</a> <a class="footnote-reference" href="#id15" id="id16">[7]</a></li>
+<li><a class="reference external" href="http://www.methods.co.nz/asciidoc/">asciidoc</a> <a class="footnote-reference" href="#id1" id="id2">[1]</a></li>
+</ul>
+<p>Adjusting build flags and use <a class="reference external" href="http://ccache.samba.org/">ccache</a> <a class="footnote-reference" href="#id4" id="id6">[2]</a> at <cite>build.ninja</cite>:</p>
+<pre class="literal-block">
+CFLAGS=-O3 CXX='/opt/local/bin/ccache g++' ./configure.py \
+  --with-gtest=./gtest-1.6.0
+</pre>
+<p>and rebuild.</p>
+<div class="attention">
+<p class="first admonition-title">Attention!</p>
+<p><cite>ninja -t clean</cite> removes generated source files!</p>
+<p>You need <a class="reference external" href="http://re2c.sf.net/">re2c</a> <a class="footnote-reference" href="#id37" id="id39">[14]</a> to build it again with your installed <cite>ninja</cite>.</p>
+<p>To bootstap it again you have to restore this generated sources:</p>
+<pre class="last literal-block">
+git checkout src/depfile_parser.cc src/lexer.cc
+</pre>
+</div>
+<p>The build times for ninja on a <strong>macbok pro</strong> with 2 CPU cores are:</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="36%" />
+<col width="31%" />
+<col width="33%" />
+</colgroup>
+<thead valign="bottom">
+<tr><th class="head">1.) build without ccache</th>
+<th class="head">rebuild with ccache</th>
+<th class="head">build &quot;no work to do&quot;</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr><td>real   0m9.444s</td>
+<td>real  0m0.849s</td>
+<td>real 0m0.005s</td>
+</tr>
+<tr><td>user   0m14.492s</td>
+<td>user  0m0.202s</td>
+<td>user 0m0.002s</td>
+</tr>
+<tr><td>sys   0m1.838s</td>
+<td>sys  0m0.248s</td>
+<td>sys 0m0.003s</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>Building tests requires gtest, to get it:</dt>
+<dd><ul class="first last simple">
+<li>On older Ubuntus you can apt-get install libgtest.</li>
+<li>On newer Ubuntus it's only distributed as source;
+1) apt-get install libgtest-dev
+2) ./configure --with-gtest=/usr/src/gtest</li>
+<li>Otherwise you need to download it, unpack it, and pass --with-gtest
+as appropriate.</li>
+</ul>
+</dd>
+</dl>
+</div>
+<div class="section" id="test-driven-development">
+<h2><a class="toc-backref" href="#id46">Test-driven development:</a></h2>
+<blockquote>
+<p>Depends on <a class="reference external" href="http://code.google.com/p/googletest/">gtest</a> <a class="footnote-reference" href="#id24" id="id26">[10]</a> source pack - Google's framework for writing C++ tests</p>
+<p>Set your build command to:</p>
+<pre class="literal-block">
+sudo apt-get install libgtest-dev
+./ninja ninja_test &amp;&amp; ./ninja_test --gtest_filter=MyTest.Name
+</pre>
+<p>now you can repeatedly run that while developing until the tests pass.
+Remember to build &quot;all&quot; before committing to verify the other source
+still works!</p>
+</blockquote>
+</div>
+<div class="section" id="testing-performance-impact-of-changes">
+<h2><a class="toc-backref" href="#id47">Testing performance impact of changes:</a></h2>
+<blockquote>
+<p>If you have a Chrome build handy, it's a good test case.
+Otherwise, <a class="reference external" href="https://github.com/martine/ninja/downloads">https://github.com/martine/ninja/downloads</a> has a copy of
+the Chrome build files (and depfiles). You can untar that, then run:</p>
+<pre class="literal-block">
+path/to/my/ninja chrome
+</pre>
+<p>and compare that against a baseline Ninja.</p>
+<p>There's a script at misc/measure.py that repeatedly runs a command like
+the above (to address variance) and summarizes its runtime.  E.g.:</p>
+<pre class="literal-block">
+path/to/misc/measure.py path/to/my/ninja chrome
+</pre>
+<p>For changing the depfile parser, you can also build 'parser_perftest'
+and run that directly on some representative input files.</p>
+</blockquote>
+</div>
+<div class="section" id="coding-guidelines">
+<h2><a class="toc-backref" href="#id48">Coding guidelines:</a></h2>
+<ul class="simple">
+<li>Function name are camelcase.</li>
+<li>Member methods are camelcase, expect for trivial getters which are
+underscore separated.</li>
+<li>Local variables are underscore separated.</li>
+<li>Member variables are underscore separated and suffixed by an extra underscore.</li>
+<li>Two spaces indentation.</li>
+<li>Opening braces is at the end of line.</li>
+<li>Lines are 80 columns maximum.</li>
+<li>All source files should have the Google Inc. license header.</li>
+<li>Also follow this style:
+<a class="reference external" href="http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml">http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml</a></li>
+</ul>
+</div>
+<div class="section" id="documentation-guidelines">
+<h2><a class="toc-backref" href="#id49">Documentation guidelines:</a></h2>
+<ul class="simple">
+<li>Use /// for <a class="reference external" href="http://www.doxygen.org/">doxygen</a> <a class="footnote-reference" href="#id15" id="id17">[7]</a>.</li>
+<li>Use a to refer to arguments.</li>
+<li>It's not necessary to document each argument, especially when they're
+relatively self-evident (e.g. in CanonicalizePath(string* path, string* err),
+the arguments are hopefully obvious)</li>
+</ul>
+<p>Build docu:</p>
+<pre class="literal-block">
+sudo apt-get install doxygen
+./ninja doxygen
+</pre>
+</div>
+<div class="section" id="generating-the-manual">
+<h2><a class="toc-backref" href="#id50">Generating the manual:</a></h2>
+<p>You need <a class="reference external" href="http://www.methods.co.nz/asciidoc/">asciidoc</a> <a class="footnote-reference" href="#id1" id="id3">[1]</a> to do it:</p>
+<pre class="literal-block">
+sudo apt-get install asciidoc --no-install-recommends
+./ninja manual
+</pre>
+</div>
+<div class="section" id="windows-development-on-linux-this-is-kind-of-hacky-right-now">
+<h2><a class="toc-backref" href="#id51">Windows development on Linux (this is kind of hacky right now):</a></h2>
+<ul>
+<li><p class="first">Get the <a class="reference external" href="http://code.google.com/p/googletest/">gtest</a> <a class="footnote-reference" href="#id24" id="id27">[10]</a> source, unpack it into your source dir:</p>
+<pre class="literal-block">
+sudo apt-get install gcc-mingw32 wine
+#or export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar
+
+CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar \
+  ./configure.py --platform=mysys --with-gtest=./gtest-1.6.0
+</pre>
+</li>
+<li><p class="first">Build ninja:</p>
+<pre class="literal-block">
+/path/to/linux/ninja
+</pre>
+</li>
+<li><p class="first">Run: ./ninja.exe  (implicitly runs through <a class="reference external" href="http://winehq.org/">wine</a> <a class="footnote-reference" href="#id40" id="id41">[15]</a> <strong>(!)</strong> )</p>
+</li>
+</ul>
+</div>
+<div class="section" id="windows-development-on-windows">
+<h2><a class="toc-backref" href="#id52">Windows development on Windows:</a></h2>
+<ul class="simple">
+<li>install <a class="reference external" href="http://mingw.org/">mingw</a> <a class="footnote-reference" href="#id28" id="id30">[11]</a>, <a class="reference external" href="http://mingw.org/wiki/MSYS/">msys</a> <a class="footnote-reference" href="#id31" id="id33">[12]</a>, and <a class="reference external" href="http://python.org/">python</a> <a class="footnote-reference" href="#id34" id="id36">[13]</a></li>
+<li>in the mingw shell, put Python in your path, and: <cite>python bootstrap.py</cite></li>
+<li>to reconfigure, run <cite>python configure.py</cite></li>
+<li>remember to strip the resulting executable if size matters to you</li>
+<li>you'll need to rename <cite>ninja.exe</cite> into <cite>my-ninja.exe</cite> during development,
+otherwise ninja won't be able to overwrite itself when building</li>
+</ul>
+</div>
+<div class="section" id="using-clang">
+<h2>Using <a class="reference external" href="http://clang.llvm.org/">clang</a> <a class="footnote-reference" href="#id7" id="id8">[3]</a>:</h2>
+<ul>
+<li><p class="first">Enable colors manually:</p>
+<pre class="literal-block">
+CXX='/path/to/llvm/Release+Asserts/bin/clang++ -fcolor-diagnostics' ./configure.py
+</pre>
+</li>
+</ul>
+</div>
+<div class="section" id="using-ninja-with-an-ide">
+<h2><a class="toc-backref" href="#id54">Using Ninja with an IDE:</a></h2>
+<p>You can configure the make-program as <em>&lt;path/to&gt;/ninja</em> within a custom project
+in <strong>Eclipse</strong>, <strong>NetBeans</strong>, or <strong>Visual Studio 2005</strong>.</p>
+<div class="hint">
+<p class="first admonition-title">Hint</p>
+<p><a class="reference external" href="http://cmake.org/">cmake</a> <a class="footnote-reference" href="#id9" id="id10">[4]</a> starting with version 2.8.9 supports on all platforms ninja
+as buildsytem.  You may generate projects for:</p>
+<blockquote class="last">
+<ul class="simple">
+<li>'Eclipse CDT4 - Ninja'</li>
+<li>'KDevelop3 - Ninja'</li>
+<li>'CodeBlocks - Ninja'</li>
+</ul>
+</blockquote>
+</div>
+<p>Or you may always use a Makefile &quot;stub&quot; and import your project as a Makefile
+based project. Use a Makefile like this:</p>
+<pre class="literal-block">
+MAKEFLAGS+= --no-builtin-rules
+export MAKE:=${MAKE} -${MAKEFLAGS}
+.SILENT:
+
+.DEFAULT: all
+all::
+
+.PHONY: help
+help:
+        ninja -t targets
+
+# NoOp rules for this Makefile
+Makefile: ;
+
+# Anything we don't know how to build will use this rule.
+#
+% :: ;
+        ninja $&#64;
+
+</pre>
+<hr class="docutils" />
+<table class="docutils footnote" frame="void" id="id1" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[1]</td><td><em>(<a class="fn-backref" href="#id2">1</a>, <a class="fn-backref" href="#id3">2</a>)</em> <a class="reference external" href="http://www.methods.co.nz/asciidoc/">http://www.methods.co.nz/asciidoc/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id4" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[2]</td><td><em>(<a class="fn-backref" href="#id5">1</a>, <a class="fn-backref" href="#id6">2</a>)</em> <a class="reference external" href="http://ccache.samba.org/">http://ccache.samba.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id7" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id8">[3]</a></td><td><a class="reference external" href="http://clang.llvm.org/">http://clang.llvm.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id9" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id10">[4]</a></td><td><a class="reference external" href="http://cmake.org/">http://cmake.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id11" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id12">[5]</a></td><td><a class="reference external" href="http://www.cygwin.com/">http://www.cygwin.com/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id13" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id14">[6]</a></td><td><a class="reference external" href="http://docutils.sourceforge.net/">http://docutils.sourceforge.net/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id15" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[7]</td><td><em>(<a class="fn-backref" href="#id16">1</a>, <a class="fn-backref" href="#id17">2</a>)</em> <a class="reference external" href="http://www.doxygen.org/">http://www.doxygen.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id18" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[8]</td><td><em>(<a class="fn-backref" href="#id19">1</a>, <a class="fn-backref" href="#id20">2</a>)</em> <a class="reference external" href="http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/">http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id21" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[9]</td><td><em>(<a class="fn-backref" href="#id22">1</a>, <a class="fn-backref" href="#id23">2</a>)</em> <a class="reference external" href="http://git-scm.com/documentation/">http://git-scm.com/documentation/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id24" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[10]</td><td><em>(<a class="fn-backref" href="#id25">1</a>, <a class="fn-backref" href="#id26">2</a>, <a class="fn-backref" href="#id27">3</a>)</em> <a class="reference external" href="http://code.google.com/p/googletest/">http://code.google.com/p/googletest/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id28" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[11]</td><td><em>(<a class="fn-backref" href="#id29">1</a>, <a class="fn-backref" href="#id30">2</a>)</em> <a class="reference external" href="http://mingw.org/">http://mingw.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id31" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[12]</td><td><em>(<a class="fn-backref" href="#id32">1</a>, <a class="fn-backref" href="#id33">2</a>)</em> <a class="reference external" href="http://mingw.org/wiki/MSYS/">http://mingw.org/wiki/MSYS/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id34" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[13]</td><td><em>(<a class="fn-backref" href="#id35">1</a>, <a class="fn-backref" href="#id36">2</a>)</em> <a class="reference external" href="http://python.org/">http://python.org/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id37" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label">[14]</td><td><em>(<a class="fn-backref" href="#id38">1</a>, <a class="fn-backref" href="#id39">2</a>)</em> <a class="reference external" href="http://re2c.sf.net/">http://re2c.sf.net/</a></td></tr>
+</tbody>
+</table>
+<table class="docutils footnote" frame="void" id="id40" rules="none">
+<colgroup><col class="label" /><col /></colgroup>
+<tbody valign="top">
+<tr><td class="label"><a class="fn-backref" href="#id41">[15]</a></td><td><a class="reference external" href="http://winehq.org/">http://winehq.org/</a></td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+<div class="footer">
+<hr class="footer" />
+Generated on: 2012-07-21.
+Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
+
+</div>
+</body>
+</html>

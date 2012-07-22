@@ -1,17 +1,20 @@
 Build Dependencies:
 --------------------
 
-**Requierd** packages:
+**Requiered** packages:
 
 - `python`_
 - `re2c`_
 
-*Recomended* package to use is:
+*Recomended* packages to use:
 
 - `ccache`_
+- `git-flow`_
+- `docutils`_
 
-*Optional packages for development* are:
+*Requiered packages for development* are:
 
+- `git`_
 - `gtest`_
 - `doxygen`_
 - `asciidoc`_
@@ -162,10 +165,17 @@ Using Ninja with an IDE:
 You can configure the make-program as *<path/to>/ninja* within a custom project
 in **Eclipse**, **NetBeans**, or **Visual Studio 2005**.
 
+.. hint:: `cmake`_ starting with version 2.8.9 supports on all platforms ninja
+          as buildsytem.  You may generate projects for:
+
+            - 'Eclipse CDT4 - Ninja'
+            - 'KDevelop3 - Ninja'
+            - 'CodeBlocks - Ninja'
+
 Or you may always use a Makefile "stub" and import your project as a Makefile
 based project. Use a Makefile like this:
 
-.. include:: GNUmakefile
+.. include:: .Makefile
              :literal:
 
 
@@ -173,14 +183,18 @@ based project. Use a Makefile like this:
 
 .. target-notes::
 
-.. _`gtest`: http://code.google.com/p/googletest/
 .. _`asciidoc`: http://www.methods.co.nz/asciidoc/
-.. _`doxygen`: http://www.doxygen.org/
+.. _`ccache`: http://ccache.samba.org/
 .. _`clang`: http://clang.llvm.org/
-.. _`re2c`: http://re2c.sf.net/
+.. _`cmake`: http://cmake.org/
+.. _`cygwin`: http://www.cygwin.com/
+.. _`docutils`: http://docutils.sourceforge.net/
+.. _`doxygen`: http://www.doxygen.org/
+.. _`git-flow`: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/
+.. _`git`: http://git-scm.com/documentation/
+.. _`gtest`: http://code.google.com/p/googletest/
 .. _`mingw`: http://mingw.org/
 .. _`msys`: http://mingw.org/wiki/MSYS/
 .. _`python`: http://python.org/
+.. _`re2c`: http://re2c.sf.net/
 .. _`wine`: http://winehq.org/
-.. _`ccache`: http://ccache.samba.org/
-

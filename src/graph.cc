@@ -140,11 +140,14 @@ bool Edge::RecomputeOutputDirty(BuildLog* build_log,
     if (rule_->restat() && build_log &&
         (entry = build_log->LookupByOutput(output->path()))) {
       if (entry->restat_mtime < most_recent_input) {
-        EXPLAIN("restat of output %s older than inputs", output->path().c_str());
+        EXPLAIN("restat of output %s older than most recent input %s (0x%016" PRIx64 " vs 0x%016" PRIx64 ")",
+            output->path().c_str(),
+            most_recent_node ? most_recent_node->path().c_str() : "",
+            entry->restat_mtime, most_recent_input);
         return true;
       }
     } else {
-      EXPLAIN("output %s older than most recent input %s (%016" PRIx64 " vs %016" PRIx64 ")",
+      EXPLAIN("output %s older than most recent input %s (0x%016" PRIx64 " vs 0x%016" PRIx64 ")",
           output->path().c_str(),
           most_recent_node ? most_recent_node->path().c_str() : "",
           output->mtime(), most_recent_input);
@@ -171,7 +174,7 @@ bool Edge::RecomputeOutputDirty(BuildLog* build_log,
     // FIXME: The FS time may not have ns resolution, so round to sec! ck
     if (((entry->restat_mtime / 10000000LL)) != ((most_recent_node->mtime()
         / 10000000LL))) {
-      EXPLAIN("generator: mtime %"PRIx64" != %"PRIx64" of file %s changed",
+      EXPLAIN("generator: mtime 0x%016"PRIx64" != 0x%016"PRIx64" of file %s changed",
           entry->restat_mtime, most_recent_node->mtime(),
           most_recent_node->path().c_str());
       return true;
@@ -355,7 +358,7 @@ bool Edge::is_phony() const {
 }
 
 void Node::Dump(const char* prefix) const {
-    printf("%s <%s 0x%p> mtime: %" PRIx64 "%s, (:%s), ",
+    printf("%s <%s 0x%p> mtime: 0x%016" PRIx64 "%s, (:%s), ",
            prefix, path().c_str(), this,
            mtime(), mtime()?"":" (:missing)",
            dirty()?" dirty":" clean");

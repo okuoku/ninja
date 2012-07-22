@@ -1,4 +1,3 @@
-*.html
 *.diff
 *.rst
 *.orig
@@ -17,6 +16,7 @@ TAGS
 /test
 /build
 /build.ninja
+/rules.ninja
 /ninja
 /build_log_perftest
 /canon_perftest
@@ -27,6 +27,13 @@ TAGS
 /doc/manual.html
 /doc/doxygen
 .DS_Store
-.*.swp
+/.*.swp
 .*~
 *~
+/gtest-1.6.0
+/CMakeFiles
+/CMakeCache.txt
+/CTestTestfile.cmake
+/cmake_install.cmake
+/Makefile
+/.ninja_log

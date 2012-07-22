@@ -9,7 +9,7 @@ includedir:=$(prefix)/include
 
 HOSTNAME:=$(shell hostname)
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
-	gtestdir:=$(shell $(bindir)/grealpath $(HOME)/Workspace/cpp/gtest-1.6.0)
+	gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/gtest-1.6.0)
 	CXX:=$(prefix)/libexec/ccache/g++
 else
 	CXX:=g++
@@ -32,12 +32,7 @@ ninja.bootstrap: bootstrap.py
 	  fi; \
 	  unzip -o $(gtestarchive); \
 	fi
-	if [ -d .git ]; then \
-	  branch=`git status -bsu no`; \
-	  revisioncount=`git log --oneline | wc -l`; \
-	  projectversion=`git describe --tags --long --always`; \
-	  echo "const char* kVersion = \"$${branch}-$${projectversion%%-*}\";" > src/version.h; \
-	fi
+	src/version.sh
 	$(RM) build.ninja
 	./$<
 	cp -p -b ninja $@
@@ -47,8 +42,10 @@ ninja.bootstrap: bootstrap.py
 ninja: ninja.bootstrap build.ninja
 	./$<
 
+# gnerate docu
 manual:: README.html
-README.html: README HACKING GNUmakefile $(bindir)/rst2html-2.7.py
+	./ninja $@
+README.html: README.rst HACKING.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
 
 ###FIXME -Wundef not usable with gtest-1.6.0! ck
@@ -71,6 +68,19 @@ src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
 src/lexer.in.cc: ;
 src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
+
+.PHONY: testcmake testcmakebuild testcmakecross
+testcmake:: testcmakecross testcmakebuild
+testcmakebuild: ninja
+	-$(RM) -f CMakeCache.txt
+	cmake -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" -Dgtest=$(gtestdir) && ./ninja
+	./ninja -v
+	./ninja -d explain
+
+testcmakecross: ${HOME}/.cmake/cmake-cross.sh
+	-$(RM) -f CMakeCache.txt
+	$<
+
 else
 src/depfile_parser.cc: ;
 src/lexer.cc: ;
@@ -92,23 +102,26 @@ help: ninja
 	./ninja -t targets
 
 clean: build.ninja
-	-$(RM) build/*.o ###XXX build.ninja
+	-$(RM) build/*.o build.ninja
 
 distclean: ###XXX clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
-	rm -rf CMakeTest/build build *.orig *~ tags ninja ninja_test *_perftest \
-		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html *.html \
-		ninja.bootstrap
+	rm -rf CMakeCache.txt CMakeFiles build *.orig *~ tags ninja ninja_test *_perftest \
+		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html \
+		ninja.bootstrap CTestTestfile.cmake cmake_install.cmake *.a *.lib
 	-git status --ignored --short
 
 install: ninja
 	install ninja $(bindir)
 
 # NoOp rules for extern dependencies
+README.rst: ;
+HACKING.rst: ;
 GNUmakefile: ;
 $(bindir)/ninja: ;
 $(bindir)/re2c: ;
 $(bindir)/rst2html-2.7.py: ;
+${HOME}/.cmake/cmake-cross.sh: ;
 
 # Anything we don't know how to build will use this rule.
 #
