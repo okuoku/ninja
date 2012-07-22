@@ -1,4 +1,4 @@
-# Copyright 2011 Google Inc. All Rights Reserved.
+# Copyright 2012 Google Inc. All Rights Reserved.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -226,14 +226,14 @@ target_link_libraries(ninja ninja_lib ${platformlibs})
 install_targets(/bin ninja)
 
 #
-# cldeps executable
+# cldeps executable XXX TBD XXX
 #
 if(windows OR cross)
-    include_directories(${srcdir})
-    add_executable(cldeps ${srcdir}/../misc/cldeps.cc)
-    set_target_properties(cldeps PROPERTIES COMPILE_FLAGS ${nortti})
-    target_link_libraries(cldeps ninja_lib ${platformlibs})
-    install_targets(/bin cldeps)
+#   include_directories(${srcdir})
+#   add_executable(cldeps ${srcdir}/../misc/cldeps.cc)
+#   set_target_properties(cldeps PROPERTIES COMPILE_FLAGS ${nortti})
+#   target_link_libraries(cldeps ninja_lib ${platformlibs})
+#   install_targets(/bin cldeps)
 endif()
 
 
@@ -286,4 +286,13 @@ if(gtest)
     # not added as test because it breaks 'make test'
     add_ninja_test(parser_perftest ${srcdir}/parser_perftest.cc)
 endif()
+
+# build a CPack driven installer package 
+include (InstallRequiredSystemLibraries) 
+set (CPACK_RESOURCE_FILE_LICENSE  
+     "${CMAKE_SOURCE_DIR}/License.txt") 
+set (CPACK_PACKAGE_VERSION_MAJOR "0") 
+set (CPACK_PACKAGE_VERSION_MINOR "1") 
+set (CPACK_PACKAGE_VERSION_PATCH "3") 
+include (CPack) 
 

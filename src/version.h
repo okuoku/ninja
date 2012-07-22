@@ -1,1 +1,1 @@
-const char* kVersion = "ninja V0.1.3 ## next-9f7081b";
+const char* kVersion = "ninja V0.1.3 ## develop-c83a8ee";

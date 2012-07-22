@@ -1,6 +1,6 @@
-==================
+=============
 Ninja
-==================
+=============
 
 Based on original version from http://martine.github.com/ninja/
 
@@ -16,15 +16,18 @@ build systems in two major respects:
 
 
 .. note:: I have forked the orignal version to support `MINGW`_, `MSYS`_, and
-          `CYGWIN`_ build too.
+          `CYGWIN`_ builds too.
+          
+          **Ninja should be usable on most platforms as cmake do!**
 
           - My version support timestamps with **100ns resolution** insteads of
-            only 1s.
+            only 1s while dependency checking.
           - It contains a *GNUmakefile* and a *CMakeLists.txt* if you like to
             work `Using Ninja with an IDE:`_
           - `ninja -V` show you a distinguish version number if you build it
             yourself from develop branch.
           - My *Nina* home page is http://clausklein.github.com/ninja/
+          - My *Nina* git repo is https://github.com/ClausKlein/ninja/
 
           Claus Klein
 
@@ -47,10 +50,27 @@ Getting a source code version of *Ninja* with `git`_ to work with::
 Building
 =============
 
-To build, run `python ./bootstrap.py`.  It first blindly compiles all non-test
-source files together, then re-builds *Ninja* using itself and `./build.ninja`.
-You should end up with a *Ninja* binary in the source root.  Run `./ninja -h`
-for help.
+To bootstrap *Ninja* and you have `python`_ istalled, run `python
+./bootstrap.py`.  It first blindly compiles all non-test source files together,
+then re-builds *Ninja* using itself and `./build.ninja`.  You should end up
+with a *Ninja* binary in the source root.  Run `./ninja -h` for help.
+
+If you like to use `cmake`_ and `make`_ to bootstrap *Ninja* create a build dir
+and generate your build project:
+
+    mkdir -p build && cd build
+    cmake  .. && make
+    # or you have already ninja installed
+    cmake -G Ninja .. && ninja 
+
+You may also create a *Mac OSX Package Maker installer* with *cpack*::
+
+    cpack -C CPackConfig.cmake -G PackageMaker
+
+On Windows you may want to create "Null Soft Installer"::
+
+    cpack -C CPackConfig.cmake -G NSIS
+
 
 The only file of interest to a user is the resulting *Ninja* binary.
 
@@ -65,7 +85,7 @@ Contributing
 =============
 
 If you want to work with code, you should use `git-flow`_ .
-Fork the repository. Then, run::
+Fork the my git repository. Then, run::
 
     git clone --recursive git@github.com:<username>/ninja.git
     git branch develop origin/develop
@@ -79,8 +99,22 @@ Then, do work and commit your changes::
 When done, open a pull request to your feature branch.
 
 
+.. _`cmake`: http://cmake.org/
+.. _`git-flow`: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/
+.. _`git`: http://git-scm.com/documentation/
+.. _`make`: http://www.gnu.org/software/make/make.html
+.. _`python`: http://python.org/
+
+
 HACKING :)
-==================
+=============
 
 .. include:: HACKING.rst
+
+---------------------------------------------------------------
+
+License
+=============
+
+.. include:: License.txt
 

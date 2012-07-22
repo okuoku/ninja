@@ -20,7 +20,7 @@ endif
 ###XXX .SILENT:
 .PHONY: test manual install clean distclean help ### all
 .DEFAULT: all
-all::
+all:: ninja
 
 # bootstrap without installed ninja!
 bootstrap.py: ;
@@ -43,9 +43,11 @@ ninja: ninja.bootstrap build.ninja
 	./$<
 
 # gnerate docu
-manual:: README.html
-	./ninja $@
-README.html: README.rst HACKING.rst GNUmakefile $(bindir)/rst2html-2.7.py
+manual: doc/manual.html index.html
+	zip gh-pages.zip $?
+doc/manual.html: doc/manual.asciidoc
+	$(bindir)/asciidoc -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
+index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
 
 ###FIXME -Wundef not usable with gtest-1.6.0! ck
@@ -60,7 +62,9 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
 
 
+.PHONY: testcrossbuild
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+
 src/depfile_parser.in.cc: ;
 src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
@@ -76,14 +80,25 @@ testcmakebuild: ninja
 	cmake -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" -Dgtest=$(gtestdir) && ./ninja
 	./ninja -v
 	./ninja -d explain
+	cpack -C CPackConfig.cmake -G PackageMaker
 
 testcmakecross: ${HOME}/.cmake/cmake-cross.sh
 	-$(RM) -f CMakeCache.txt
 	$<
 
+testcrossbuild:
+	export CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar; \
+      ./configure.py --platform=mysys && ./ninja
+
 else
+
+testcrossbuild:
+	export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar; \
+      ./configure.py --platform=mysys && ./ninja
+
 src/depfile_parser.cc: ;
 src/lexer.cc: ;
+
 endif
 
 test:: ninja_test
@@ -107,8 +122,9 @@ clean: build.ninja
 distclean: ###XXX clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeCache.txt CMakeFiles build *.orig *~ tags ninja ninja_test *_perftest \
-		hash_collision_bench *.exe *.pdb *.ninja doc/doxygen/html \
-		ninja.bootstrap CTestTestfile.cmake cmake_install.cmake *.a *.lib
+		hash_collision_bench *.exe *.pdb *.ninja .ninja_log doc/doxygen/html \
+		ninja.bootstrap CTestTestfile.cmake cmake_install.cmake *.a *.lib \
+		CPack*.cmake install_manifest.txt _CPack_Packages
 	-git status --ignored --short
 
 install: ninja
@@ -117,12 +133,13 @@ install: ninja
 # NoOp rules for extern dependencies
 README.rst: ;
 HACKING.rst: ;
+License.rst: ;
 GNUmakefile: ;
+$(bindir)/asciidoc: ;
 $(bindir)/ninja: ;
 $(bindir)/re2c: ;
 $(bindir)/rst2html-2.7.py: ;
 ${HOME}/.cmake/cmake-cross.sh: ;
-
 # Anything we don't know how to build will use this rule.
 #
 % :: ninja

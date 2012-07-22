@@ -162,7 +162,7 @@ Using `clang`_:
 Using Ninja with an IDE:
 ------------------------
 
-You can configure the make-program as *<path/to>/ninja* within a custom project
+You can configure the `make`_ program as *<path/to>/ninja* within a custom project
 in **Eclipse**, **NetBeans**, or **Visual Studio 2005**.
 
 .. hint:: `cmake`_ starting with version 2.8.9 supports on all platforms ninja
@@ -172,8 +172,8 @@ in **Eclipse**, **NetBeans**, or **Visual Studio 2005**.
             - 'KDevelop3 - Ninja'
             - 'CodeBlocks - Ninja'
 
-Or you may always use a Makefile "stub" and import your project as a Makefile
-based project. Use a Makefile like this:
+Or you may always use a Makefile "stub" and import your project as a **Makefile
+based project**. Use a Makefile like this:
 
 .. include:: .Makefile
              :literal:
@@ -193,8 +193,10 @@ based project. Use a Makefile like this:
 .. _`git-flow`: http://jeffkreeftmeijer.com/2010/why-arent-you-using-git-flow/
 .. _`git`: http://git-scm.com/documentation/
 .. _`gtest`: http://code.google.com/p/googletest/
+.. _`make`: http://www.gnu.org/software/make/make.html
 .. _`mingw`: http://mingw.org/
 .. _`msys`: http://mingw.org/wiki/MSYS/
 .. _`python`: http://python.org/
 .. _`re2c`: http://re2c.sf.net/
 .. _`wine`: http://winehq.org/
+
