@@ -106,7 +106,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
     if(debug)
         set(cflags "${cflags} -D_GLIBCXX_DEBUG -D_GLIBCXX_DEBUG_PEDANTIC")
     endif()
-    if(unix AND NOT MINGW)
+    if(unix AND NOT MINGW AND NOT CYGWIN)
         set(platformlibs pthread)
         set(cflags "${cflags} -fvisibility=hidden")
     elseif(windows)
@@ -287,12 +287,30 @@ if(gtest)
     add_ninja_test(parser_perftest ${srcdir}/parser_perftest.cc)
 endif()
 
-# build a CPack driven installer package 
-include (InstallRequiredSystemLibraries) 
-set (CPACK_RESOURCE_FILE_LICENSE  
-     "${CMAKE_SOURCE_DIR}/License.txt") 
-set (CPACK_PACKAGE_VERSION_MAJOR "0") 
-set (CPACK_PACKAGE_VERSION_MINOR "1") 
-set (CPACK_PACKAGE_VERSION_PATCH "3") 
-include (CPack) 
+# build a CPack driven installer package
+include(InstallRequiredSystemLibraries)
 
+set(CPACK_SOURCE_GENERATOR "TGZ")
+set(CPACK_SOURCE_IGNORE_FILES ".*~;\\\\.swp$;\\\\.zip$;/gtest-1.6.0/;/test/;/build/;/\\\\.git/;\\\\.*project;/\\\\.externalToolBuilders/")
+
+if (APPLE)
+    set(CPACK_GENERATOR "PackageMaker")
+elseif(CYGWIN)
+    set(CPACK_GENERATOR "CygwinBinary")
+else()
+    set(CPACK_GENERATOR "NSIS")
+endif()
+
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+     "Ninja is a small build system with a focus on speed.")
+set(CPACK_PACKAGE_VENDOR "Claus Klein")
+set(CPACK_PACKAGE_DESCRIPTION_FILE
+    "${CMAKE_SOURCE_DIR}/README.rst")
+set(CPACK_RESOURCE_FILE_LICENSE
+    "${CMAKE_SOURCE_DIR}/License.txt")
+
+set(CPACK_PACKAGE_VERSION_MAJOR "0")
+set(CPACK_PACKAGE_VERSION_MINOR "1")
+set(CPACK_PACKAGE_VERSION_PATCH "3")
+
+include(CPack)
