@@ -10,7 +10,8 @@ includedir:=$(prefix)/include
 HOSTNAME:=$(shell hostname)
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
 	gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/gtest-1.6.0)
-	CXX:=$(prefix)/libexec/ccache/g++
+	export CXX=$(prefix)/libexec/ccache/g++
+	export CC=$(prefix)/libexec/ccache/gcc
 else
 	CXX:=g++
 	gtestdir:=gtest-1.6.0
@@ -77,7 +78,8 @@ src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
 testcmake:: testcmakecross testcmakebuild
 testcmakebuild: ninja
 	-$(RM) -f CMakeCache.txt
-	cmake -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" -Dgtest=$(gtestdir) && ./ninja
+	cmake -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
+		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest=$(gtestdir) && ./ninja
 	./ninja -v
 	./ninja -d explain
 	cpack -C CPackConfig.cmake -G PackageMaker

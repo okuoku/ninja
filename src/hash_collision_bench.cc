@@ -14,6 +14,7 @@
 
 #include "build_log.h"
 #include <algorithm> // use sort
+#include <time.h> // use time
 
 int random(int low, int high) {
   return int(low + (rand() / double(RAND_MAX)) * (high - low) + 0.5);

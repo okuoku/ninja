@@ -41,7 +41,8 @@ macro(ninja_option_list)
     endforeach()
 endmacro()
 
-ninja_option(platform        "target platform (unix/windows)"        OFF)
+### USAGE EXAMPLE:  cmake -G "Ninja" -Dplatform=msys ..
+ninja_option(platform        "target platform (unix/windows/msys)"   OFF)
 ninja_option(compiler        "compiler (default/clang)"              OFF)
 ninja_option(debug           "enable debugging flags"                OFF)
 ninja_option(verbose         "verbose output while building"         OFF)
@@ -53,6 +54,9 @@ if(platform)
 elseif(UNIX)
     message(STATUS "platform=unix")
     set(unix 1)
+elseif(MSYS OR ENV{MSYSCON})
+    message(STATUS "platform=msys")
+    set(msys 1)
 elseif(WIN32)
     message(STATUS "platform=windows")
     set(windows 1)
@@ -63,6 +67,17 @@ if(debug)
     set(CMAKE_BUILD_TYPE Debug)
 else()
     set(CMAKE_BUILD_TYPE Release)
+endif()
+
+### USAGE EXAMPLE:  cmake -G "MSYS Makefiles" -Dplatform=msys ..
+if(msys)
+    message(STATUS "platform=msys")
+    ### set(CMAKE_GENERATOR "MSYS Makefiles" CACHE INTERNAL "" FORCE )
+    set(CMAKE_C_COMPILER "C:/MinGW/bin/gcc.exe" )
+    set(CMAKE_CXX_COMPILER "C:/MinGW/bin/g++.exe" )
+    set(CMAKE_RC_COMPILER "C:/MinGW/bin/windres.exe" )
+    set(cross mingw32) ### TODO
+    set(compiler gnu)
 endif()
 
 # cross compile

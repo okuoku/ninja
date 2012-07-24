@@ -27,7 +27,7 @@ sys.path.insert(0, 'misc')
 import ninja_syntax
 
 parser = OptionParser()
-platforms = ['linux', 'freebsd', 'mysys', 'mingw', 'windows']
+platforms = ['linux', 'freebsd', 'msys', 'mingw', 'windows']
 profilers = ['gmon', 'pprof']
 parser.add_option('--platform',
                   help='target platform (' + '/'.join(platforms) + ')',
@@ -55,8 +55,8 @@ configure_env = dict((k, os.environ[k]) for k in os.environ if k in env_keys)
 
 MSYSCON = configure_env.get('MSYSCON')
 if MSYSCON:
-    print "mysys shell found, use MSYSCON=%s" % MSYSCON
-    platform = host = 'mysys'
+    print "msys shell found, use MSYSCON=%s" % MSYSCON
+    platform = host = 'msys'
 else:
     platform = options.platform
 
@@ -67,8 +67,8 @@ if platform is None:
         platform = 'linux'
     elif platform.startswith('freebsd'):
         platform = 'freebsd'
-    elif platform.startswith('mysys'):
-        platform = 'mysys'
+    elif platform.startswith('msys'):
+        platform = 'msys'
     elif platform.startswith('mingw'):
         platform = 'mingw'
     elif platform.startswith('win'):
@@ -94,7 +94,7 @@ objext = '.o'
 if platform == 'windows':
     CXX = 'cl'
     objext = '.obj'
-elif platform in ('mysys', 'mingw'):
+elif platform in ('msys', 'mingw'):
     objext = '.obj'
 
 def src(filename):
@@ -108,7 +108,7 @@ def cc(name, **kwargs):
 def cxx(name, **kwargs):
     return n.build(built(name + objext), 'cxx', src(name + '.cc'), **kwargs)
 def binary(name):
-    if platform in ('mysys', 'mingw', 'windows'):
+    if platform in ('msys', 'mingw', 'windows'):
         return name + '.exe'
     return name
 
@@ -146,7 +146,7 @@ else:
     ldflags = ['-L$builddir']
 libs = []
 
-if platform in ('cygwin', 'mysys', 'mingw'):
+if platform in ('cygwin', 'msys', 'mingw'):
     cflags.remove('-fvisibility=hidden');
     ldflags.append('-static')
 elif platform == 'sunos5':
@@ -204,7 +204,7 @@ elif host == 'mingw':
            description='AR $out',
 	       rspfile='$out.rsp',
 	       rspfile_content='$in')
-elif host == 'mysys':
+elif host == 'msys':
     n.rule('ar',
            command='sh -c "rm -f $out && $ar crs $out @$out.rsp"',
            description='AR $out',
@@ -235,7 +235,7 @@ n.newline()
 
 objs = []
 
-if platform not in ('cygwin', 'mysys', 'mingw', 'windows'):
+if platform not in ('cygwin', 'msys', 'mingw', 'windows'):
     n.comment('browse_py.h is used to inline browse.py.')
     n.rule('inline',
            command='src/inline.sh $varname < $in > $out',
@@ -249,15 +249,15 @@ if platform not in ('cygwin', 'mysys', 'mingw', 'windows'):
     objs += cxx('browse', order_only=built('browse_py.h'))
     n.newline()
 
-n.comment('the depfile parser and ninja lexers are generated using re2c.')
-n.rule('re2c',
-       command='re2c -b -i --no-generation-date -o $out $in',
-       description='RE2C $out',
-       generator=True)  #XXX prevent clean of generated files
-# Generate the .cc files in the source directory so we can check them in.
-n.build(src('depfile_parser.cc'), 're2c', src('depfile_parser.in.cc'))
-n.build(src('lexer.cc'), 're2c', src('lexer.in.cc'))
-n.newline()
+    n.comment('the depfile parser and ninja lexers are generated using re2c.')
+    n.rule('re2c',
+           command='re2c -b -i --no-generation-date -o $out $in',
+           description='RE2C $out',
+           generator=True)  #XXX prevent clean of generated files
+    # Generate the .cc files in the source directory so we can check them in.
+    n.build(src('depfile_parser.cc'), 're2c', src('depfile_parser.in.cc'))
+    n.build(src('lexer.cc'), 're2c', src('lexer.in.cc'))
+    n.newline()
 
 n.comment('Core source files all build into ninja library.')
 for name in ['build',
@@ -278,18 +278,18 @@ for name in ['build',
     objs += cxx(name)
 if platform == 'linux':
     objs += cc('clockgettime_linux')
-if platform in ('mysys', 'mingw', 'windows'):
+if platform in ('msys', 'mingw', 'windows'):
     objs += cxx('subprocess-win32')
     objs += cc('getopt')
 else:
     objs += cxx('subprocess')
-if platform in ('mysys', 'mingw', 'windows'):
+if platform in ('msys', 'mingw', 'windows'):
     ninja_lib = n.build(built('ninja.lib'), 'ar', objs)
 else:
     ninja_lib = n.build(built('libninja.a'), 'ar', objs)
 n.newline()
 
-if platform in ('mysys', 'mingw', 'windows'):
+if platform in ('msys', 'mingw', 'windows'):
     libs.append(built('ninja.lib'))
 else:
     libs.append('-lninja')
@@ -318,7 +318,7 @@ if options.with_gtest:
     gtest_all_incs = '-I%s -I%s' % (path, '/'.join([path, 'include']))
     if platform == 'windows':
         gtest_cflags = '/nologo /EHsc ' + gtest_all_incs
-    elif platform in ('mysys', 'mingw'):
+    elif platform in ('msys', 'mingw'):
         gtest_cflags = '-Wno-undef ' + gtest_all_incs   # too many warnings with gtest
     else:
         gtest_cflags = '-fvisibility=hidden -Wno-undef ' + gtest_all_incs   # too many warnings with gtest
@@ -351,7 +351,7 @@ for name in ['build_log_test',
              'util_test']:
     objs += cxx(name, variables=[('cflags', test_cflags)])
 
-if platform not in ('mysys', 'mingw', 'windows'):
+if platform not in ('msys', 'mingw', 'windows'):
     test_libs.append('-lpthread')
 ninja_test = n.build(binary('ninja_test'), 'link', objs, implicit=ninja_lib,
                      variables=[('ldflags', test_ldflags),
@@ -411,7 +411,7 @@ n.build('doxygen', 'doxygen', doc('doxygen.config'),
         implicit=mainpage)
 n.newline()
 
-if host not in ('mysys', 'mingw', 'windows'):
+if host not in ('msys', 'mingw', 'windows'):
     n.comment('Regenerate build files if build script changes.')
     n.rule('configure',
            command='${configure_env}%s configure.py $configure_args' %

@@ -21,6 +21,8 @@ set -u
 set -e
 # set -x
 
+which git || exit 0	# OK, noop
+
 if [ -d .git ]; then
   branch=`git status -bsu no`
   revisioncount=`git log --oneline | wc -l`
