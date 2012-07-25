@@ -48,7 +48,7 @@ void RunBrowsePython(State* state, const char* ninja_command,
       const char* command[] = {
         NINJA_PYTHON, "-", ninja_command, initial_target, NULL
       };
-      execvp(command[0], (char**)command);
+      execvp(command[0], const_cast<char**>(command));
       perror("ninja: execvp");
     } while (false);
     _exit(1);

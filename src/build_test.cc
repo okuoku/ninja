@@ -821,7 +821,7 @@ TEST_F(BuildWithLogTest, RestatMissingInput) {
 
   // The implicit dependencies and the depfile itself 
   // are newer than the output
-  TimeStamp restat_mtime = ++now_;  // FIXME 100 ns resolution! ck
+  // FIXME TimeStamp restat_mtime = ++now_;  // 100 ns resolution! ck
   fs_.Create("out1.d", now_, "out1: will.be.deleted restat.file\n");
   fs_.Create("will.be.deleted", now_, "");
   fs_.Create("restat.file", now_, "");
@@ -843,7 +843,7 @@ TEST_F(BuildWithLogTest, RestatMissingInput) {
   // Now remove a file, referenced from depfile, so that target becomes 
   // dirty, but the output does not change
   fs_.RemoveFile("will.be.deleted");
-  
+
   // Trigger the build again - only out1 gets built
   commands_ran_.clear();
   state_.Reset();
