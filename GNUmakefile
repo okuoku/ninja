@@ -40,7 +40,7 @@ endif
 ###XXX .SILENT:
 .PHONY: test manual install clean distclean help all testbuilds
 .DEFAULT: all
-all:: ninja manual test testbuilds
+all:: ninja test testbuilds
 
 # bootstrap without installed ninja!
 bootstrap.py: ;
@@ -50,7 +50,9 @@ ninja.bootstrap: bootstrap.py
 	  if [ ! -f $(gtestarchive) ] ; then \
 	    wget --verbose http://googletest.googlecode.com/files/$(gtestarchive); \
 	  fi; \
-	  unzip -o $(gtestarchive); \
+	  if [ -f $(gtestarchive) ] ; then \
+	    unzip -o $(gtestarchive); \
+	  fi; \
 	fi
 	src/version.sh
 	$(RM) build.ninja
@@ -62,18 +64,16 @@ ninja.bootstrap: bootstrap.py
 ninja: ninja.bootstrap build.ninja
 	./$<
 
-# gnerate docu
-manual: doc/manual.html index.html
-	zip gh-pages.zip $?
-doc/manual.html: doc/manual.asciidoc
-	$(bindir)/asciidoc -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
-index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
-	$(bindir)/rst2html-2.7.py -dg $< > $@
 
-###FIXME -Wundef not usable with gtest-1.6.0! ck
-###XXX	CPPFLAGS="-I$(gtestdir)/include -I$(includedir) -DUSE_TIME_T" \
-###TODO CXXFLAGS are not used! ck
+.PHONY: testcrossbuild
+testbuilds: testcrossbuild
 
+ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+#================================================
+
+all:: manual
+
+# build ninja with gtest
 build.ninja: src/depfile_parser.cc src/lexer.cc
 	CPPFLAGS="-I$(gtestdir)/include -I$(includedir)" \
 	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
@@ -81,12 +81,13 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	LDFLAGS="-L$(libdir)" \
 	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
 
-
-.PHONY: testcrossbuild
-testbuilds: testcrossbuild
-
-ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
-#================================================
+# gnerate docu
+manual: doc/manual.html index.html
+	zip gh-pages.zip $?
+doc/manual.html: doc/manual.asciidoc
+	$(bindir)/asciidoc -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
+index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
+	$(bindir)/rst2html-2.7.py -dg $< > $@
 
 src/depfile_parser.in.cc: ;
 src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
@@ -118,6 +119,13 @@ testcrossbuild:
 #================================================
 else
 #================================================
+
+build.ninja: src/depfile_parser.cc src/lexer.cc
+	CPPFLAGS="-I$(gtestdir)/include -I$(includedir)" \
+	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
+	CFLAGS='-Wsign-compare -Wconversion -Wpointer-arith -Wcomment -Wcast-align -Wcast-qual' \
+	LDFLAGS="-L$(libdir)" \
+	CXX="$(CXX)" ./configure.py --debug
 
 testcrossbuild:
 	export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar; \

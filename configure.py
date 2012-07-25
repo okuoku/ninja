@@ -202,14 +202,14 @@ elif host == 'mingw':
     n.rule('ar',
            command='cmd /c $ar cqs $out.tmp @$out.rsp && move /Y $out.tmp $out',
            description='AR $out',
-	       rspfile='$out.rsp',
-	       rspfile_content='$in')
+           rspfile='$out.rsp',
+           rspfile_content='$in')
 elif host == 'msys':
     n.rule('ar',
            command='sh -c "rm -f $out && $ar crs $out @$out.rsp"',
            description='AR $out',
-	       rspfile='$out.rsp',
-	       rspfile_content='$in')
+           rspfile='$out.rsp',
+           rspfile_content='$in')
 else:
     n.rule('ar',
            command='rm -f $out && $ar crs $out $in',
@@ -386,14 +386,15 @@ dot = n.build(built('graph.dot'), 'gendot', ['ninja', 'build.ninja'])
 n.build('graph.png', 'gengraph', dot)
 n.newline()
 
-n.comment('Generate the manual using asciidoc.')
-n.rule('asciidoc',
-       command='asciidoc -a toc -a max-width=45em -o $out $in',
-       description='ASCIIDOC $in')
-manual = n.build(doc('manual.html'), 'asciidoc', doc('manual.asciidoc'))
-n.build('manual', 'phony',
-        order_only=manual)
-n.newline()
+if platform not in ('cygwin', 'msys', 'mingw', 'windows'):
+    n.comment('Generate the manual using asciidoc.')
+    n.rule('asciidoc',
+           command='asciidoc -a toc -a max-width=45em -o $out $in',
+           description='ASCIIDOC $in')
+    manual = n.build(doc('manual.html'), 'asciidoc', doc('manual.asciidoc'))
+    n.build('manual', 'phony',
+            order_only=manual)
+    n.newline()
 
 n.comment('Generate Doxygen.')
 n.rule('doxygen',
@@ -405,7 +406,7 @@ n.rule('doxygen_mainpage',
        command='$doxygen_mainpage_generator $in > $out',
        description='DOXYGEN_MAINPAGE $out')
 mainpage = n.build(built('doxygen_mainpage'), 'doxygen_mainpage',
-                   ['README', 'HACKING', 'COPYING'],
+                   ['README.rst', 'HACKING.rst', 'COPYING'],
                    implicit=['$doxygen_mainpage_generator'])
 n.build('doxygen', 'doxygen', doc('doxygen.config'),
         implicit=mainpage)

@@ -61,16 +61,16 @@ EOF
 include_file()
 {
   local file="$1"
-  if ! [ -r "$file" ]
+  if ! [ -r "${file}" ]
   then
-    error "'$file' is not readable."
+    error "'${file}' is not readable."
     return
   fi
   cat <<EOF
- * \\section $file
+ * \\section ${file%.*}
  * \\verbatim
 EOF
-  cat < "$file"
+  cat < "${file}"
   cat <<EOF
  \\endverbatim
 EOF
