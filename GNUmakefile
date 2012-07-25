@@ -1,3 +1,18 @@
+# Copyright 2012 Google Inc. All Rights Reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+#
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
 MAKEFLAGS+= --no-builtin-rules
 export MAKE:=${MAKE} -${MAKEFLAGS}
 
@@ -9,19 +24,23 @@ includedir:=$(prefix)/include
 
 HOSTNAME:=$(shell hostname)
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+#================================================
 	gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/gtest-1.6.0)
 	export CXX=$(prefix)/libexec/ccache/g++
 	export CC=$(prefix)/libexec/ccache/gcc
+#================================================
 else
+#================================================
 	CXX:=g++
 	gtestdir:=gtest-1.6.0
 	gtestarchive:=$(gtestdir).zip
+#================================================
 endif
 
 ###XXX .SILENT:
-.PHONY: test manual install clean distclean help ### all
+.PHONY: test manual install clean distclean help all testbuilds
 .DEFAULT: all
-all:: ninja
+all:: ninja manual test testbuilds
 
 # bootstrap without installed ninja!
 bootstrap.py: ;
@@ -64,7 +83,10 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 
 
 .PHONY: testcrossbuild
+testbuilds: testcrossbuild
+
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+#================================================
 
 src/depfile_parser.in.cc: ;
 src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
@@ -75,6 +97,7 @@ src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
 	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
 
 .PHONY: testcmake testcmakebuild testcmakecross
+testbuilds: testcmake
 testcmake:: testcmakecross testcmakebuild
 testcmakebuild: ninja
 	-$(RM) -f CMakeCache.txt
@@ -90,17 +113,20 @@ testcmakecross: ${HOME}/.cmake/cmake-cross.sh
 
 testcrossbuild:
 	export CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar; \
-      ./configure.py --platform=mysys && ./ninja
+      ./configure.py --platform=msys && ./ninja
 
+#================================================
 else
+#================================================
 
 testcrossbuild:
 	export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar; \
-      ./configure.py --platform=mysys && ./ninja
+      ./configure.py --platform=msys && ./ninja
 
 src/depfile_parser.cc: ;
 src/lexer.cc: ;
 
+#================================================
 endif
 
 test:: ninja_test
