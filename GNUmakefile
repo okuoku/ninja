@@ -22,36 +22,41 @@ bindir:=$(prefix)/bin
 libdir:=$(prefix)/lib
 includedir:=$(prefix)/include
 
+CXX:=$(shell which g++)
+CMAKE:=$(shell which cmake)
+CPACK:=$(shell which cpack)
+WGET:=$(shell which wget)
+UNZIP:=$(shell which unzip)
+ZIP:=$(shell which zip)
+ASCIIDOC:=$(shell which asciidoc)
 HOSTNAME:=$(shell hostname)
+
+gtestdir:=gtest-1.6.0
+gtestarchive:=$(gtestdir).zip
+
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
 #================================================
-	gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/gtest-1.6.0)
+	###XXX gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/$(gtestdir))
 	export CXX=$(prefix)/libexec/ccache/g++
 	export CC=$(prefix)/libexec/ccache/gcc
-#================================================
-else
-#================================================
-	CXX:=g++
-	gtestdir:=gtest-1.6.0
-	gtestarchive:=$(gtestdir).zip
 #================================================
 endif
 
 ###XXX .SILENT:
-.PHONY: test manual install clean distclean help all testbuilds
+.PHONY: test bench manual install clean distclean help all testbuilds
 .DEFAULT: all
-all:: ninja test testbuilds
+all:: ninja test bench testbuilds
 
 # bootstrap without installed ninja!
 bootstrap.py: ;
 ninja.bootstrap: bootstrap.py
 	ls -lrtd --full-time
 	if [ ! -d $(gtestdir) ] ; then \
-	  if [ ! -f $(gtestarchive) ] ; then \
-	    wget --verbose http://googletest.googlecode.com/files/$(gtestarchive); \
+	  if [ ! -f "$(gtestarchive)" -a -n "$(WGET)" ] ; then \
+	    "$(WGET)" --verbose http://googletest.googlecode.com/files/$(gtestarchive); \
 	  fi; \
-	  if [ -f $(gtestarchive) ] ; then \
-	    unzip -o $(gtestarchive); \
+	  if [ -f "$(gtestarchive)" -a -n "$(UNZIP)" ] ; then \
+	    "$(UNZIP)" -o $(gtestarchive); \
 	  fi; \
 	fi
 	src/version.sh
@@ -60,20 +65,11 @@ ninja.bootstrap: bootstrap.py
 	cp -p -b ninja $@
 	-$(RM) build.ninja
 
-# bootstrap with install ninja!
+# rebuild ninja with ninja.bootstrap and needed gtest!
 ninja: ninja.bootstrap build.ninja
 	./$<
 
-
-.PHONY: testcrossbuild
-testbuilds: testcrossbuild
-
-ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
-#================================================
-
-all:: manual
-
-# build ninja with gtest
+# configure to build ninja with gtest
 build.ninja: src/depfile_parser.cc src/lexer.cc
 	CPPFLAGS="-I$(gtestdir)/include -I$(includedir)" \
 	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
@@ -81,11 +77,17 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	LDFLAGS="-L$(libdir)" \
 	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
 
+.PHONY: testcrossbuild
+testbuilds: testcrossbuild
+
+ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
+#================================================
+
 # gnerate docu
 manual: doc/manual.html index.html
 	zip gh-pages.zip $?
 doc/manual.html: doc/manual.asciidoc
-	$(bindir)/asciidoc -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
+	$(ASCIIDOC) -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
 index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
 
@@ -102,34 +104,27 @@ testbuilds: testcmake
 testcmake:: testcmakecross testcmakebuild
 testcmakebuild: ninja
 	-$(RM) -f CMakeCache.txt
-	cmake -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
-		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest=$(gtestdir) && ./ninja
-	./ninja -v
-	./ninja -d explain
-	cpack -C CPackConfig.cmake -G PackageMaker
+	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
+		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" && ./$<
+	./$< -v
+	./$< -d explain
+	$(CPACK) -C CPackConfig.cmake -G PackageMaker
 
 testcmakecross: ${HOME}/.cmake/cmake-cross.sh
 	-$(RM) -f CMakeCache.txt
 	$<
 
-testcrossbuild:
+testcrossbuild: ninja
 	export CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar; \
-      ./configure.py --platform=msys && ./ninja
+      ./configure.py --platform=msys && ./$<
 
 #================================================
 else
 #================================================
 
-build.ninja: src/depfile_parser.cc src/lexer.cc
-	CPPFLAGS="-I$(gtestdir)/include -I$(includedir)" \
-	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
-	CFLAGS='-Wsign-compare -Wconversion -Wpointer-arith -Wcomment -Wcast-align -Wcast-qual' \
-	LDFLAGS="-L$(libdir)" \
-	CXX="$(CXX)" ./configure.py --debug
-
-testcrossbuild:
+testcrossbuild: ninja
 	export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar; \
-      ./configure.py --platform=msys && ./ninja
+      ./configure.py --platform=msys && ./$<
 
 src/depfile_parser.cc: ;
 src/lexer.cc: ;
