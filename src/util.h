@@ -56,11 +56,6 @@ int ReadFile(const string& path, string* contents, string* err);
 /// Mark a file descriptor to not be inherited on exec()s.
 void SetCloseOnExec(int fd);
 
-/// Get the current time as relative to some epoch.
-/// Epoch varies between platforms; only useful for measuring elapsed
-/// time.
-int64_t GetTimeMillis();
-
 /// Get the current ticks since epoch as 100ns value.
 /// Epoch varies between platforms; only useful for measuring elapsed
 /// time.

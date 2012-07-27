@@ -123,7 +123,7 @@ if platform == 'windows':
     cflags = ['/nologo', '/Zi', '/W4', '/WX', '/wd4530', '/wd4100', '/wd4706',
               '/wd4512', '/wd4800', '/wd4702', '/wd4819', '/GR-',
               '/DNOMINMAX', '/D_CRT_SECURE_NO_WARNINGS',
-              "/DNINJA_PYTHON=\"%s\"" % (options.with_python,)]
+              '/DNINJA_PYTHON="%s"' % options.with_python]
     ldflags = ['/DEBUG', '/libpath:$builddir']
     if not options.debug:
         cflags += ['/Ox', '/DNDEBUG', '/GL']
@@ -143,6 +143,8 @@ else:
         cflags += ['-O2', '-DNDEBUG']
     if 'clang' in os.path.basename(CXX):
         cflags += ['-fcolor-diagnostics']
+    if platform == 'mingw':
+        cflags += ['-D_WIN32_WINNT=0x0501']
     ldflags = ['-L$builddir']
 libs = []
 
@@ -425,6 +427,26 @@ if host not in ('msys', 'mingw', 'windows'):
 n.comment('Build only the main binary by default.')
 n.default(ninja)
 n.newline()
+
+if host == 'linux':
+    n.comment('Packaging')
+    n.rule('rpmbuild',
+           command="rpmbuild \
+           --define 'ver git' \
+           --define \"rel `git rev-parse --short HEAD`\" \
+           --define '_topdir %(pwd)/rpm-build' \
+           --define '_builddir %{_topdir}' \
+           --define '_rpmdir %{_topdir}' \
+           --define '_srcrpmdir %{_topdir}' \
+           --define '_rpmfilename %%{NAME}-%%{VERSION}-%%{RELEASE}.%%{ARCH}.rpm' \
+           --define '_specdir %{_topdir}' \
+           --define '_sourcedir  %{_topdir}' \
+           --quiet \
+           -bb misc/packaging/ninja.spec",
+           description='Building RPM..')
+    n.build('rpm', 'rpmbuild',
+            implicit=['ninja','README', 'COPYING', doc('manual.html')])
+    n.newline()
 
 n.build('all', 'phony', all_targets)
 
