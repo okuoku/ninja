@@ -445,7 +445,7 @@ if host == 'linux':
            -bb misc/packaging/ninja.spec",
            description='Building RPM..')
     n.build('rpm', 'rpmbuild',
-            implicit=['ninja','README', 'COPYING', doc('manual.html')])
+            implicit=['ninja','README.rst', 'COPYING', doc('manual.html')])
     n.newline()
 
 n.build('all', 'phony', all_targets)
