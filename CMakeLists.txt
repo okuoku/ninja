@@ -258,15 +258,18 @@ endif()
 if(gtest)
     enable_testing()
 
-    find_path (GTEST_INCLUDE_DIR "gtest/gtest.h" HINT "${gtest}/include" NO_DEFAULT_PATH )
-    if (GTEST_INCLUDE_DIR-NOTFOUND)
+    find_path (_GTEST_INCLUDE_DIR "gtest/gtest.h" HINT "${gtest}/include" NO_DEFAULT_PATH )
+    if (_GTEST_INCLUDE_DIR-NOTFOUND)
         message(SEND_ERROR "gtest/gtest.h not found at '${gtest}/include'.")
     else ()
-        get_filename_component(GTEST_ROOT_DIR ${GTEST_INCLUDE_DIR} PATH) # without include
+	get_filename_component(_GTEST_ROOT_DIR ${_GTEST_INCLUDE_DIR} PATH) # without include
+	###FIXME: workarount for spaces in ${CMAKE_SOURCE_DIR} or ${gtest}
+	file(RELATIVE_PATH GTEST_ROOT_DIR ${CMAKE_SOURCE_DIR} ${_GTEST_ROOT_DIR})
+	file(RELATIVE_PATH GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR} ${_GTEST_INCLUDE_DIR})
     endif ()
 
     macro(set_test_cflags target)
-        set(tflags "-DGTEST_HAS_PTHREAD=0 -I${GTEST_INCLUDE_DIR}" )
+        set(tflags "-DGTEST_HAS_PTHREAD=0" )
         set_target_properties(${target} PROPERTIES COMPILE_FLAGS "${tflags} -I${GTEST_INCLUDE_DIR} ${ARGN}")
     endmacro()
 

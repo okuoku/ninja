@@ -15,6 +15,7 @@
 
 MAKEFLAGS+= --no-builtin-rules
 export MAKE:=${MAKE} -${MAKEFLAGS}
+export LANG=C
 
 prefix?=/opt/local
 
@@ -28,6 +29,8 @@ CPACK:=$(shell which cpack)
 WGET:=$(shell which wget)
 UNZIP:=$(shell which unzip)
 ZIP:=$(shell which zip)
+GIT:=$(shell which git)
+RE2C:=$(shell which re2c)
 ASCIIDOC:=$(shell which asciidoc)
 HOSTNAME:=$(shell hostname)
 
@@ -36,7 +39,6 @@ gtestarchive:=$(gtestdir).zip
 
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
 #================================================
-	###XXX gtestdir:=$(shell $(bindir)/grealpath ${HOME}/Workspace/cpp/$(gtestdir))
 	export CXX=$(prefix)/libexec/ccache/g++
 	export CC=$(prefix)/libexec/ccache/gcc
 #================================================
@@ -75,14 +77,15 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
 	CFLAGS='-Wsign-compare -Wconversion -Wpointer-arith -Wcomment -Wcast-align -Wcast-qual' \
 	LDFLAGS="-L$(libdir)" \
-	CXX="$(CXX)" ./configure.py --debug --with-gtest=$(gtestdir)
+	CXX="$(CXX)" ./configure.py --debug --with-gtest="$(gtestdir)"
 
-.PHONY: testcrossbuild
-testbuilds: testcrossbuild
+.PHONY: testcmakebuild testcrossbuild
+testbuilds: testcmakebuild testcrossbuild
 
 ifeq ($(HOSTNAME),claus-kleins-macbook-pro.local)
 #================================================
 
+ifneq ($(ASCIIDOC),)
 # gnerate docu
 manual: doc/manual.html index.html
 	zip gh-pages.zip $?
@@ -90,25 +93,24 @@ doc/manual.html: doc/manual.asciidoc
 	$(ASCIIDOC) -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
 index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
+endif
 
+ifneq ($(RE2C),)
 src/depfile_parser.in.cc: ;
-src/depfile_parser.cc: src/depfile_parser.in.cc $(bindir)/re2c
-	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
+src/depfile_parser.cc: src/depfile_parser.in.cc
+	$(RE2C) -b -i --no-generation-date -o $@ $<
 
 src/lexer.in.cc: ;
-src/lexer.cc: src/lexer.in.cc $(bindir)/re2c
-	$(bindir)/re2c -b -i --no-generation-date -o $@ $<
+src/lexer.cc: src/lexer.in.cc
+	$(RE2C) -b -i --no-generation-date -o $@ $<
+else
+src/depfile_parser.cc: ;
+src/lexer.cc: ;
+endif
 
 .PHONY: testcmake testcmakebuild testcmakecross
 testbuilds: testcmake
 testcmake:: testcmakecross testcmakebuild
-testcmakebuild: ninja
-	-$(RM) -f CMakeCache.txt
-	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
-		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" && ./$<
-	./$< -v
-	./$< -d explain
-	$(CPACK) -C CPackConfig.cmake -G PackageMaker
 
 testcmakecross: ${HOME}/.cmake/cmake-cross.sh
 	-$(RM) -f CMakeCache.txt
@@ -132,6 +134,16 @@ src/lexer.cc: ;
 #================================================
 endif
 
+testcmakebuild: ninja
+	./$< -V
+ifneq ($(CMAKE),)
+	-$(RM) -f CMakeCache.txt
+	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
+		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" && ./$<
+	./$< -V
+	"$(CPACK)" -C CPackConfig.cmake ### -G PackageMaker
+endif
+
 test:: ninja_test
 	./$<
 
@@ -147,16 +159,18 @@ bench:: hash_collision_bench
 help: ninja
 	./ninja -t targets
 
-clean: build.ninja
+clean:
 	-$(RM) build/*.o build.ninja
 
-distclean: ###XXX clean
+distclean: clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete
 	rm -rf CMakeCache.txt CMakeFiles build *.orig *~ tags ninja ninja_test *_perftest \
 		hash_collision_bench *.exe *.pdb *.ninja .ninja_log doc/doxygen/html \
 		ninja.bootstrap CTestTestfile.cmake cmake_install.cmake *.a *.lib \
 		CPack*.cmake install_manifest.txt _CPack_Packages
-	-git status --ignored --short
+ifneq ($(GIT),)
+	${GIT} status --ignored --short
+endif
 
 install: ninja
 	install ninja $(bindir)
