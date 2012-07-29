@@ -320,7 +320,7 @@ if options.with_gtest:
     gtest_all_incs = '-I%s -I%s' % (path, '/'.join([path, 'include']))
     if platform == 'windows':
         gtest_cflags = '/nologo /EHsc ' + gtest_all_incs
-    elif platform in ('msys', 'mingw'):
+    elif platform in ('cygwin', 'msys', 'mingw'):
         gtest_cflags = '-Wno-undef ' + gtest_all_incs   # too many warnings with gtest
     else:
         gtest_cflags = '-fvisibility=hidden -Wno-undef ' + gtest_all_incs   # too many warnings with gtest

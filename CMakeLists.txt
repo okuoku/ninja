@@ -206,8 +206,8 @@ if(PYTHONINTERP_FOUND)
     if(unix AND NOT MINGW)
         set(inline ${CMAKE_BINARY_DIR}/build/concrete_inline.sh)
         file(WRITE ${inline}
-            "mkdir -p ${CMAKE_BINARY_DIR}/build
-            ${srcdir}/inline.sh kBrowsePy < ${srcdir}/browse.py > ${CMAKE_BINARY_DIR}/build/browse_py.h\n")
+            "mkdir -p \"${CMAKE_BINARY_DIR}/build\"
+            \"${srcdir}/inline.sh\" kBrowsePy < \"${srcdir}/browse.py\" > \"${CMAKE_BINARY_DIR}/build/browse_py.h\"\n")
         set(browser 1)
     endif()
     if(browser)

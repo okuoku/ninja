@@ -149,7 +149,7 @@ TEST_F(SubprocessTest, SetWithMulti) {
   }
 }
 
-#if !defined(_WIN32) && !defined(__APPLE__)
+#if !defined(_WIN32) && !defined(__APPLE__) && !defined(__CYGWIN__)
 TEST_F(SubprocessTest, SetWithLots) {
   // Arbitrary big number; needs to be over 1024 to confirm we're no longer
   // hostage to pselect.
