@@ -25,7 +25,6 @@ includedir:=$(prefix)/include
 
 CXX:=$(shell which g++)
 CMAKE:=$(shell which cmake)
-CPACK:=$(shell which cpack)
 WGET:=$(shell which wget)
 UNZIP:=$(shell which unzip)
 ZIP:=$(shell which zip)
@@ -77,7 +76,7 @@ build.ninja: src/depfile_parser.cc src/lexer.cc
 	CXXFLAGS='-Wall -Wextra -Weffc++ -Wold-style-cast -Wcast-qual -Wundef -std=c++11' \
 	CFLAGS='-Wsign-compare -Wconversion -Wpointer-arith -Wcomment -Wcast-align -Wcast-qual' \
 	LDFLAGS="-L$(libdir)" \
-	CXX="$(CXX)" ./configure.py --debug --with-gtest="$(gtestdir)"
+	CXX="$(CXX)" ./configure.py --debug --with-gtest="$(CURDIR)/$(gtestdir)"
 
 .PHONY: testcmakebuild testcrossbuild
 testbuilds: testcmakebuild testcrossbuild
@@ -113,7 +112,7 @@ testbuilds: testcmake
 testcmake:: testcmakecross testcmakebuild
 
 testcmakecross: ${HOME}/.cmake/cmake-cross.sh
-	-$(RM) -rf CMakeCache.txt CMakeFiles
+	-$(RM) -rf CMakeCache.txt CMakeFiles build/*
 	$< -Dgtest="$(CURDIR)/$(gtestdir)" -Dplatform=windows
 
 testcrossbuild: ninja
@@ -137,11 +136,11 @@ endif
 testcmakebuild: ninja
 	./$< -V
 ifneq ($(CMAKE),)
-	-$(RM) -rf CMakeCache.txt CMakeFiles
+	-$(RM) -rf CMakeCache.txt CMakeFiles build/*
+	cd build && \
 	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
-		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" && ./$<
-	./$< -V
-	"$(CPACK)" -C CPackConfig.cmake
+		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" .. && \
+		../$< && ../$< package
 endif
 
 test:: ninja_test

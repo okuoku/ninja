@@ -136,14 +136,14 @@ else:
               '-fno-rtti',
               '-fno-exceptions',
               '-fvisibility=hidden', '-pipe',
-              "-DNINJA_PYTHON=\\\"%s\\\"" % options.with_python]
+              '-DNINJA_PYTHON="%s"' % options.with_python]
     if options.debug:
         cflags += ['-D_GLIBCXX_DEBUG', '-D_GLIBCXX_DEBUG_PEDANTIC']
     else:
         cflags += ['-O2', '-DNDEBUG']
     if 'clang' in os.path.basename(CXX):
         cflags += ['-fcolor-diagnostics']
-    if platform == 'mingw':
+    if platform in ('msys', 'mingw'):
         cflags += ['-D_WIN32_WINNT=0x0501']
     ldflags = ['-L$builddir']
 libs = []
@@ -165,11 +165,10 @@ else:
 def shell_escape(str):
     """Escape str such that it's interpreted as a single argument by the shell."""
     # This isn't complete, but it's just enough to make NINJA_PYTHON work.
-    # TODO: do the appropriate thing for Windows-style cmd here, perhaps by
-    # just returning the input string.
-    if platform == 'mingw' or platform == 'windows':
-        if '"' in str:
-            return "'%s'" % str.replace("'", "\\'")
+    if platform in ('windows', 'mingw'):
+      return str
+    if '"' in str:
+        return "'%s'" % str.replace("'", "\\'")
     return str
 
 cppflags = []
