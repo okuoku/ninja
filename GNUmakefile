@@ -113,8 +113,8 @@ testbuilds: testcmake
 testcmake:: testcmakecross testcmakebuild
 
 testcmakecross: ${HOME}/.cmake/cmake-cross.sh
-	-$(RM) -f CMakeCache.txt
-	$<
+	-$(RM) -rf CMakeCache.txt CMakeFiles
+	$< -Dgtest="$(CURDIR)/$(gtestdir)" -Dplatform=windows
 
 testcrossbuild: ninja
 	export CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar; \
@@ -137,11 +137,11 @@ endif
 testcmakebuild: ninja
 	./$< -V
 ifneq ($(CMAKE),)
-	-$(RM) -f CMakeCache.txt
+	-$(RM) -rf CMakeCache.txt CMakeFiles
 	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
 		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" && ./$<
 	./$< -V
-	"$(CPACK)" -C CPackConfig.cmake ### -G PackageMaker
+	"$(CPACK)" -C CPackConfig.cmake
 endif
 
 test:: ninja_test
@@ -161,6 +161,7 @@ help: ninja
 
 clean:
 	-$(RM) build/*.o build.ninja
+	-$(RM) -rf CMakeCache.txt CMakeFiles
 
 distclean: clean
 	find . \( -name '*~' -o -name '.*~' -o -name '*.pyc' \) -delete

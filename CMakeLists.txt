@@ -60,7 +60,6 @@ elseif(MSYS OR ENV{MSYSCON})
 elseif(WIN32)
     message(STATUS "platform=windows")
     set(windows 1)
-    add_definitions(-D_WIN32_WINNT=0x0501)
 endif()
 
 if(debug)
@@ -80,16 +79,22 @@ if(msys)
     set(compiler gnu)
 endif()
 
+### USAGE: cmake -G Ninja -Dgtest=gtest-1.6.0 -Dplatform=windows ..
 # cross compile
 if(UNIX AND windows)
-    set(CMAKE_SYSTEM_NAME Windows)
+    message(STATUS "cross compile")
+    set(CMAKE_SYSTEM_NAME windows)
     if(NOT compiler)
-        set(cross i586-mingw32msvc) ### TODO
+        set(cross i386-mingw32)     ### TODO check the toolchain!
+        set(USER_ROOT_PATH /opt/local/bin)
+        set(cross ${USER_ROOT_PATH}/${cross})
+        message(STATUS "cross=${cross}")
     endif()
-    set(CMAKE_C_COMPILER ${cross}-cc)
-    set(CMAKE_CXX_COMPILER ${cross}-c++)
-    set(CMAKE_RC_COMPILER ${cross}-windres)
-    set(CMAKE_FIND_ROOT_PATH /usr/${cross}) ### TODO
+    set(CMAKE_C_COMPILER "${cross}-gcc")
+    set(CMAKE_CXX_COMPILER "${cross}-g++")
+    set(CMAKE_RC_COMPILER "${cross}-windres")
+    set(CMAKE_FIND_ROOT_PATH /opt/local/${cross} ${USER_ROOT_PATH})   ### TODO check the toolchain!
+    set(compiler ${CMAKE_CXX_COMPILER})
 endif()
 
 if(compiler STREQUAL clang)
@@ -97,8 +102,26 @@ if(compiler STREQUAL clang)
     set(CMAKE_CXX_COMPILER clang++)
 endif()
 
+# use ccache if found
+find_program(CCACHE_EXECUTABLE "ccache" HINTS /usr/local/bin /opt/local/bin)
+if(CCACHE_EXECUTABLE AND NOT windows)
+    message(STATUS "use ccache")
+    if(NOT compiler)
+        find_program(GXX_EXECUTABLE "g++" HINTS /usr/local/bin /opt/local/bin)
+        set(compiler ${GXX_EXECUTABLE})
+    endif()
+    ### set(CMAKE_C_COMPILER ${CCACHE_EXECUTABLE})
+    ### set(CMAKE_C_COMPILER_ARG1 ${GCC_EXECUTABLE})
+    ###FIXME set(CMAKE_CXX_COMPILER "${CCACHE_EXECUTABLE}")
+    set(CMAKE_CXX_COMPILER "${CCACHE_EXECUTABLE}" CACHE PATH "" FORCE)
+    set(CMAKE_CXX_COMPILER_ARG1 ${compiler})
+endif()
+
+
+# ====================================
 # this triggers the compiler detection
 project(ninja CXX)
+# ====================================
 
 if(verbose)
     set(CMAKE_VERBOSE_MAKEFILE ON)
@@ -125,7 +148,7 @@ if(CMAKE_COMPILER_IS_GNUCXX)
         set(platformlibs pthread)
         set(cflags "${cflags} -fvisibility=hidden")
     elseif(windows)
-        set(platformlibs shlwapi.lib iberty)
+        ###FIXME set(platformlibs shlwapi.lib iberty)
     endif()
 elseif(MSVC)
     set(cflags "/WX /wd4530 /wd4100 /wd4706 /wd4512 /wd4800 /wd4702")
@@ -172,14 +195,13 @@ if(unix AND NOT MINGW)
     endif(LINUX)
 elseif(windows OR MINGW)
     list(APPEND ninja_lib ${srcdir}/getopt.c ${srcdir}/subprocess-win32.cc)
+    add_definitions(-D_WIN32_WINNT=0x0501)
 endif()
 
 
-set (RE2C_FOUND FALSE)
-find_program (RE2C_EXECUTABLE "re2c")
-if (RE2C_EXECUTABLE)
-    set (RE2C_FOUND TRUE)
-    set (RE2C_FLAGS -b -i --no-generation-date)
+find_program(RE2C_EXECUTABLE "re2c")
+if(RE2C_EXECUTABLE)
+    set(RE2C_FLAGS -b -i --no-generation-date)
 
     # build src/depfile_parser.cc: re2c src/depfile_parser.in.cc
     # build src/lexer.cc: re2c src/lexer.in.cc
@@ -195,12 +217,9 @@ if (RE2C_EXECUTABLE)
             DEPENDS ${srcdir}/${_in}
         )
     endforeach()
-endif (RE2C_EXECUTABLE)
+endif(RE2C_EXECUTABLE)
 
 
-# FIXME: this is a HACK with needs shell utills!
-#  TODO: why generate to build dir? ck
-# see src/browse.py, src/inline.sh, .../bindir/concrete_inline.sh
 find_package(PythonInterp)
 if(PYTHONINTERP_FOUND)
     if(unix AND NOT MINGW)
@@ -240,17 +259,6 @@ set_target_properties(ninja PROPERTIES COMPILE_FLAGS ${nortti})
 target_link_libraries(ninja ninja_lib ${platformlibs})
 install_targets(/bin ninja)
 
-#
-# cldeps executable XXX TBD XXX
-#
-if(windows OR cross)
-#   include_directories(${srcdir})
-#   add_executable(cldeps ${srcdir}/../misc/cldeps.cc)
-#   set_target_properties(cldeps PROPERTIES COMPILE_FLAGS ${nortti})
-#   target_link_libraries(cldeps ninja_lib ${platformlibs})
-#   install_targets(/bin cldeps)
-endif()
-
 
 #
 # Tests, gtest should be the path to gtest sources
@@ -258,15 +266,14 @@ endif()
 if(gtest)
     enable_testing()
 
-    find_path (_GTEST_INCLUDE_DIR "gtest/gtest.h" HINT "${gtest}/include" NO_DEFAULT_PATH )
-    if (_GTEST_INCLUDE_DIR-NOTFOUND)
+    # Find the directory containing the file
+    find_path(GTEST_INCLUDE_DIR "gtest/gtest.h" HINTS "${gtest}/include" CMAKE_FIND_ROOT_PATH_BOTH)
+    if(GTEST_INCLUDE_DIR)
+        message(STATUS "Found gtest include dir: ${GTEST_INCLUDE_DIR}")
+        get_filename_component(GTEST_ROOT_DIR ${GTEST_INCLUDE_DIR} PATH) # without include
+    else()
         message(SEND_ERROR "gtest/gtest.h not found at '${gtest}/include'.")
-    else ()
-	get_filename_component(_GTEST_ROOT_DIR ${_GTEST_INCLUDE_DIR} PATH) # without include
-	###FIXME: workarount for spaces in ${CMAKE_SOURCE_DIR} or ${gtest}
-	file(RELATIVE_PATH GTEST_ROOT_DIR ${CMAKE_SOURCE_DIR} ${_GTEST_ROOT_DIR})
-	file(RELATIVE_PATH GTEST_INCLUDE_DIR ${CMAKE_SOURCE_DIR} ${_GTEST_INCLUDE_DIR})
-    endif ()
+    endif()
 
     macro(set_test_cflags target)
         set(tflags "-DGTEST_HAS_PTHREAD=0" )
@@ -305,16 +312,19 @@ if(gtest)
     add_ninja_test(parser_perftest ${srcdir}/parser_perftest.cc)
 endif()
 
+
 # build a CPack driven installer package
 include(InstallRequiredSystemLibraries)
 
 set(CPACK_SOURCE_GENERATOR "TGZ")
 set(CPACK_SOURCE_IGNORE_FILES ".*~;\\\\.swp$;\\\\.zip$;/gtest-1.6.0/;/test/;/build/;/\\\\.git/;\\\\.*project;/\\\\.externalToolBuilders/")
 
-if (APPLE)
+if(APPLE)
     set(CPACK_GENERATOR "PackageMaker")
 elseif(CYGWIN)
     set(CPACK_GENERATOR "CygwinBinary")
+elseif(UNIX)
+    set(CPACK_GENERATOR "TBZ2")  ###TBD###
 else()
     set(CPACK_GENERATOR "NSIS")
 endif()
