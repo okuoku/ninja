@@ -46,7 +46,7 @@ endif
 ###XXX .SILENT:
 .PHONY: test bench manual install clean distclean help all testbuilds
 .DEFAULT: all
-all:: ninja test bench testbuilds
+all:: ninja test bench manual testbuilds
 
 # bootstrap without installed ninja!
 bootstrap.py: ;
@@ -92,6 +92,8 @@ doc/manual.html: doc/manual.asciidoc
 	$(ASCIIDOC) -a toc -a max-width=45em -o doc/manual.html doc/manual.asciidoc
 index.html: README.rst HACKING.rst License.rst GNUmakefile $(bindir)/rst2html-2.7.py
 	$(bindir)/rst2html-2.7.py -dg $< > $@
+else
+manual: ;
 endif
 
 ifneq ($(RE2C),)
@@ -117,7 +119,8 @@ testcmakecross: ${HOME}/.cmake/cmake-cross.sh
 
 testcrossbuild: ninja
 	export CC=i386-mingw32-cc CXX=i386-mingw32-c++ AR=i386-mingw32-ar; \
-      ./configure.py --platform=msys && ./$<
+      ./configure.py --platform=msys --with-gtest="$(CURDIR)/$(gtestdir)" && ./$<
+	-$(RM) build.ninja
 
 #================================================
 else
@@ -125,7 +128,8 @@ else
 
 testcrossbuild: ninja
 	export CC=i586-mingw32msvc-cc CXX=i586-mingw32msvc-c++ AR=i586-mingw32msvc-ar; \
-      ./configure.py --platform=msys && ./$<
+      ./configure.py --platform=msys --with-gtest="$(CURDIR)/$(gtestdir)" && ./$<
+	-$(RM) build.ninja
 
 src/depfile_parser.cc: ;
 src/lexer.cc: ;
@@ -139,9 +143,12 @@ ifneq ($(CMAKE),)
 	-$(RM) -rf CMakeCache.txt CMakeFiles build/*
 	cd build && \
 	"$(CMAKE)" -G Ninja -DCMAKE_MAKE_PROGRAM:STRING="$(CURDIR)/ninja" \
-		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(gtestdir)" .. && \
+		-DCMAKE_CXX_COMPILER:FILEPATH="${CXX}" -Dgtest="$(CURDIR)/$(gtestdir)" .. && \
 		../$< && ../$< package
 endif
+
+test:: ninja
+	./$< all
 
 test:: ninja_test
 	./$<
@@ -153,7 +160,7 @@ test:: build_log_perftest
 	./$<
 
 bench:: hash_collision_bench
-	./$<
+	time ./$<
 
 help: ninja
 	./ninja -t targets

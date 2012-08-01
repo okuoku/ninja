@@ -166,9 +166,9 @@ def shell_escape(str):
     """Escape str such that it's interpreted as a single argument by the shell."""
     # This isn't complete, but it's just enough to make NINJA_PYTHON work.
     if platform in ('windows', 'mingw'):
-      return str
+        return str
     if '"' in str:
-        return "'%s'" % str.replace("'", "\\'")
+        return "%s" % str.replace('"', '\\"')
     return str
 
 cppflags = []
