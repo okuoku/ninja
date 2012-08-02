@@ -70,7 +70,7 @@ for src in glob.glob('src/*.cc'):
     sources.append(src)
 
 if sys.platform.startswith('linux'):
-    sources.append('src/clockgettime_linux.c')
+    sources.append('src/clockgettime-linux.c')
 
 if sys.platform.startswith('win32'):
     sources.append('src/getopt.c')
