@@ -278,12 +278,14 @@ for name in ['build',
              'util']:
     objs += cxx(name)
 if platform == 'linux':
-    objs += cc('clockgettime_linux')
+    objs += cc('clockgettime-linux')
 if platform in ('msys', 'mingw', 'windows'):
     objs += cxx('subprocess-win32')
+    if platform == 'windows':
+        objs += cxx('minidump-win32')
     objs += cc('getopt')
 else:
-    objs += cxx('subprocess')
+    objs += cxx('subprocess-posix')
 if platform in ('msys', 'mingw', 'windows'):
     ninja_lib = n.build(built('ninja.lib'), 'ar', objs)
 else:
