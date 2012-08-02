@@ -68,6 +68,7 @@ ninja.bootstrap: bootstrap.py
 
 # rebuild ninja with ninja.bootstrap and needed gtest!
 ninja: ninja.bootstrap build.ninja
+	ls -lrtd --full-time src/lexer*.cc src/depfile_parser*.cc
 	./$<
 
 # configure to build ninja with gtest

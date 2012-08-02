@@ -604,7 +604,7 @@ int RunBuild(Globals* globals, int argc, char** argv) {
   return 0;
 }
 
-#ifdef _MSC_VER
+#if defined(_MSC_VER) && !defined(__MINGW32__) && !defined(NINJA_BOOTSTRAP)
 
 } // anonymous namespace
 
