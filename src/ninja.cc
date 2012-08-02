@@ -795,7 +795,7 @@ reload:
 }  // anonymous namespace
 
 int main(int argc, char** argv) {
-#if !defined(NINJA_BOOTSTRAP) && defined(_MSC_VER)
+#if defined(_MSC_VER) && !defined(__MINGW32__) && !defined(NINJA_BOOTSTRAP)
   // Set a handler to catch crashes not caught by the __try..__except
   // block (e.g. an exception in a stack-unwind-block).
   set_terminate(TerminateHandler);

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-#ifndef NINJA_BOOTSTRAP
+#if defined(_MSC_VER) && !defined(__MINGW32__) && !defined(NINJA_BOOTSTRAP)
 
 #include <windows.h>
 #include <DbgHelp.h>

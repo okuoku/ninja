@@ -191,7 +191,7 @@ set(ninja_lib
 if(unix AND NOT MINGW)
     list(APPEND  ninja_lib ${srcdir}/subprocess-posix.cc)
     if(LINUX)
-        list(APPEND  ninja_lib ${srcdir}/clockgettime_linux.cc)
+        list(APPEND  ninja_lib ${srcdir}/clockgettime-linux.cc)
     endif(LINUX)
 elseif(windows OR MINGW)
     list(APPEND ninja_lib ${srcdir}/getopt.c ${srcdir}/subprocess-win32.cc
