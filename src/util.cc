@@ -359,3 +359,14 @@ double GetLoadAverage() {
 }
 #endif // _WIN32
 
+string ElideMiddle(const string& str, size_t width) {
+  const int kMargin = 3;  // Space for "...".
+  string result = str;
+  if (result.size() + kMargin > width) {
+    int elide_size = (width - kMargin) / 2;
+    result = result.substr(0, elide_size)
+      + "..."
+      + result.substr(result.size() - elide_size, elide_size);
+  }
+  return result;
+}
