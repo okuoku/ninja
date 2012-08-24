@@ -8,6 +8,7 @@
 *.pyc
 *.exe
 *.pdb
+*.ilk
 TAGS
 /.project
 /.cproject

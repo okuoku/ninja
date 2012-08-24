@@ -34,10 +34,6 @@
 
 #include <vector>
 
-#ifdef _WIN32
-#include <direct.h>  // _mkdir
-#endif
-
 #if defined(__APPLE__) || defined(__FreeBSD__)
 #include <sys/sysctl.h>
 #elif defined(linux)
@@ -85,7 +81,7 @@ void Error(const char* msg, ...) {
 
 bool CanonicalizePath(string* path, string* err) {
   METRIC_RECORD("canonicalize str");
-  int len = path->size();
+  size_t len = path->size();
   char* str = 0;
   if (len > 0)
     str = &(*path)[0];
@@ -96,7 +92,7 @@ bool CanonicalizePath(string* path, string* err) {
 }
 
 //FIXME: only posix path separator handled! ck
-bool CanonicalizePath(char* path, int* len, string* err) {
+bool CanonicalizePath(char* path, size_t* len, string* err) {
   // WARNING: this function is performance-critical; please benchmark
   // any changes you make to it.
   METRIC_RECORD("canonicalize path");
@@ -115,8 +111,19 @@ bool CanonicalizePath(char* path, int* len, string* err) {
   const char* end = start + *len;
 
   if (*src == '/') {
+#ifdef _WIN32
+    // network path starts with //
+    if (*len > 1 && *(src + 1) == '/') {
+      src += 2;
+      dst += 2;
+    } else {
+      ++src;
+      ++dst;
+    }
+#else
     ++src;
     ++dst;
+#endif
   }
 
   while (src < end) {
@@ -162,14 +169,6 @@ bool CanonicalizePath(char* path, int* len, string* err) {
 
   *len = dst - start - 1;
   return true;
-}
-
-int MakeDir(const string& path) {
-#ifdef _WIN32
-  return _mkdir(path.c_str());
-#else
-  return mkdir(path.c_str(), 0777);
-#endif
 }
 
 int ReadFile(const string& path, string* contents, string* err) {
@@ -287,6 +286,10 @@ string GetLastErrorString() {
   LocalFree(msg_buf);
   return msg;
 }
+
+void Win32Fatal(const char* function) {
+  Fatal("%s: %s", function, GetLastErrorString().c_str());
+}
 #endif
 
 static bool islatinalpha(int c) {
@@ -363,7 +366,7 @@ string ElideMiddle(const string& str, size_t width) {
   const int kMargin = 3;  // Space for "...".
   string result = str;
   if (result.size() + kMargin > width) {
-    int elide_size = (width - kMargin) / 2;
+    size_t elide_size = (width - kMargin) / 2;
     result = result.substr(0, elide_size)
       + "..."
       + result.substr(result.size() - elide_size, elide_size);

@@ -60,8 +60,8 @@ ninja.bootstrap: bootstrap.py
 	    "$(UNZIP)" -o $(gtestarchive); \
 	  fi; \
 	fi
-	src/version.sh
-	$(RM) build.ninja
+	-src/version.sh
+	-$(RM) build.ninja
 	./$<
 	cp -p -b ninja $@
 	-$(RM) build.ninja
@@ -139,7 +139,7 @@ src/lexer.cc: ;
 endif
 
 testcmakebuild: ninja
-	./$< -V
+	./$< --version
 ifneq ($(CMAKE),)
 	-$(RM) -rf CMakeCache.txt CMakeFiles build/*
 	cd build && \

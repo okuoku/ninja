@@ -32,6 +32,7 @@
 #include "build.h"
 #include "build_log.h"
 #include "clean.h"
+#include "disk_interface.h"
 #include "edit_distance.h"
 #include "explain.h"
 #include "graph.h"
@@ -65,6 +66,8 @@ struct Globals {
   BuildConfig config;
   /// Loaded state (rules, nodes). This is a pointer so it can be reset.
   State* state;
+  /// Functions for interacting with the disk.
+  RealDiskInterface disk_interface;
 };
 
 /// Print usage information.
@@ -73,14 +76,12 @@ void Usage(const BuildConfig& config) {
 "usage: ninja [options] [targets...]\n"
 "\n"
 "if targets are unspecified, builds the 'default' target (see manual).\n"
-"targets are paths, with additional special syntax:\n"
-"  'target^' means 'the first output that uses target'.\n"
-"  example: 'ninja foo.cc^' will likely build foo.o.\n"
 "\n"
 "options:\n"
+"  --version  print ninja version (\"%s\")\n"
+"\n"
 "  -C DIR   change to DIR before doing anything else\n"
 "  -f FILE  specify input build file [default=build.ninja]\n"
-"  -V       print ninja version (\"%s\")\n"
 "\n"
 "  -j N     run N jobs in parallel [default=%d]\n"
 "  -l N     do not start new jobs if the load average is greater than N\n"
@@ -88,13 +89,12 @@ void Usage(const BuildConfig& config) {
 "           (not yet implemented on Windows)\n"
 #endif
 "  -k N     keep going until N jobs fail [default=1]\n"
-"  -n       dry run (don't run commands but pretend they succeeded)\n"
+"  -n       dry run (don't run commands but act like they succeeded)\n"
 "  -v       show all command lines while building\n"
 "\n"
 "  -d MODE  enable debugging (use -d list to list modes)\n"
-"  -t TOOL  run a subtool\n"
-"    use '-t list' to list subtools.\n"
-"    terminates toplevel options; further flags are passed to the tool.\n",
+"  -t TOOL  run a subtool (use -t list to list subtools)\n"
+"    terminates toplevel options; further flags are passed to the tool\n",
           kVersion, config.parallelism);
 }
 
@@ -121,16 +121,16 @@ struct RealFileReader : public ManifestParser::FileReader {
 
 /// Rebuild the build manifest, if necessary.
 /// Returns true if the manifest was rebuilt.
-bool RebuildManifest(State* state, const BuildConfig& config,
-                     const char* input_file, string* err) {
+bool RebuildManifest(Globals* globals, const char* input_file, string* err) {
   string path = input_file;
   if (!CanonicalizePath(&path, err))
     return false;
-  Node* node = state->LookupNode(path);
+  Node* node = globals->state->LookupNode(path);
   if (!node)
     return false;
 
-  Builder manifest_builder(state, config);
+  Builder manifest_builder(globals->state, globals->config,
+                           &globals->disk_interface);
   if (!manifest_builder.AddTarget(node, err))
     return false;
 
@@ -578,7 +578,7 @@ int RunBuild(Globals* globals, int argc, char** argv) {
     return 1;
   }
 
-  Builder builder(globals->state, globals->config);
+  Builder builder(globals->state, globals->config, &globals->disk_interface);
   for (size_t i = 0; i < targets.size(); ++i) {
     if (!builder.AddTarget(targets[i], &err)) {
       if (!err.empty()) {
@@ -645,8 +645,10 @@ int NinjaMain(int argc, char** argv) {
 
   globals.config.parallelism = GuessParallelism();
 
+  enum { OPT_VERSION = 1 };
   const option kLongOptions[] = {
     { "help", no_argument, NULL, 'h' },
+    { "version", no_argument, NULL, OPT_VERSION },
     { NULL, 0, NULL, 0 }
   };
 
@@ -697,7 +699,7 @@ int NinjaMain(int argc, char** argv) {
       case 'C':
         working_dir = optarg;
         break;
-      case 'V':
+      case OPT_VERSION:
         printf("%s\n", kVersion);
         return 0;
       case 'h':
@@ -744,17 +746,22 @@ reload:
   const char* kLogPath = ".ninja_log";
   string log_path = kLogPath;
   if (!build_dir.empty()) {
-    if (MakeDir(build_dir) < 0 && errno != EEXIST) {
+    log_path = build_dir + "/" + kLogPath;
+    if (!globals.disk_interface.MakeDirs(log_path) && errno != EEXIST) {
       Error("creating build directory %s: %s",
             build_dir.c_str(), strerror(errno));
       return 1;
     }
-    log_path = build_dir + "/" + kLogPath;
   }
 
   if (!build_log.Load(log_path, &err)) {
     Error("loading build log %s: %s", log_path.c_str(), err.c_str());
     return 1;
+  }
+  if (!err.empty()) {
+    // Hack: Load() can return a warning via err by returning true.
+    Warning("%s", err.c_str());
+    err.clear();
   }
 
   if (!build_log.OpenForWrite(log_path, &err)) {
@@ -764,7 +771,7 @@ reload:
 
   if (!rebuilt_manifest) { // Don't get caught in an infinite loop by a rebuild
                            // target that is never up to date.
-    if (RebuildManifest(globals.state, globals.config, input_file, &err)) {
+    if (RebuildManifest(&globals, input_file, &err)) {
       rebuilt_manifest = true;
       globals.ResetState();
       goto reload;

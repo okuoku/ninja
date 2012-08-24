@@ -16,6 +16,11 @@
 #include <algorithm> // use sort
 #include <time.h> // use time
 
+#include <algorithm>
+using namespace std;
+
+#include <time.h>
+
 int random(int low, int high) {
   return int(low + (rand() / double(RAND_MAX)) * (high - low) + 0.5);
 }
@@ -34,7 +39,7 @@ int main() {
   char** commands = new char*[N];
   pair<uint64_t, int>* hashes = new pair<uint64_t, int>[N];
 
-  srand(time(NULL));
+  srand((int)time(NULL));
 
   for (int i = 0; i < N; ++i) {
     RandomCommand(&commands[i]);

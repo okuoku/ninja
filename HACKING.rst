@@ -1,4 +1,4 @@
-Build Dependencies:
+Build Dependencies
 --------------------
 
 **Requiered** packages:
@@ -47,86 +47,133 @@ The build times for ninja on a **macbok pro** with 2 CPU cores are:
 +---------------------------+-----------------------+-------------------------+
 
 
-Building tests requires gtest, to get it:
-  - On older Ubuntus you can apt-get install libgtest.
-  - On newer Ubuntus it's only distributed as source;
-    1) apt-get install libgtest-dev
-    2) ./configure --with-gtest=/usr/src/gtest
-  - Otherwise you need to download it, unpack it, and pass --with-gtest
-    as appropriate.
-
-Test-driven development:
+Test-driven development
 ------------------------
 
-  Depends on `gtest`_ source pack - Google's framework for writing C++ tests
+Depends on `gtest`_ source pack - Google's framework for writing C++ tests
 
-  Set your build command to::
+Installing gtest
+................
+
+- On newer Ubuntus it's distributed as source::
 
     sudo apt-get install libgtest-dev
-    ./ninja ninja_test && ./ninja_test --gtest_filter=MyTest.Name
+    ./configure --with-gtest=/usr/src/gtest
 
-  now you can repeatedly run that while developing until the tests pass.
-  Remember to build "all" before committing to verify the other source
-  still works!
+- Otherwise you need to download it, unpack it:
 
-Testing performance impact of changes:
---------------------------------------
+    wget http://googletest.googlecode.com/files/gtest-1.6.0.zip
+    unzip /gtest-1.6.0.zip
 
-  If you have a Chrome build handy, it's a good test case.
-  Otherwise, https://github.com/martine/ninja/downloads has a copy of
-  the Chrome build files (and depfiles). You can untar that, then run::
+- And set your build command to::
 
-    path/to/my/ninja chrome
+  ./configure.py --with-gtest=./gtest-1.6.0
+  ./ninja ninja_test && ./ninja_test --gtest_filter=MyTest.Name
 
-  and compare that against a baseline Ninja.
+Now you can repeatedly build and run `ninja_test` while developing until the
+tests pass.  Remember to build "all" before committing to verify the other
+source still works!
 
-  There's a script at misc/measure.py that repeatedly runs a command like
-  the above (to address variance) and summarizes its runtime.  E.g.::
 
-    path/to/misc/measure.py path/to/my/ninja chrome
+Testing performance impact of changes
+......................................
 
-  For changing the depfile parser, you can also build 'parser_perftest'
-  and run that directly on some representative input files.
+If you have a Chrome build handy, it's a good test case.
+Otherwise, https://github.com/martine/ninja/downloads has a copy of
+the Chrome build files (and depfiles). You can untar that, then run::
 
-Coding guidelines:
-------------------
+  path/to/my/ninja chrome
 
-- Function name are camelcase.
-- Member methods are camelcase, expect for trivial getters which are
+and compare that against a baseline Ninja.
+
+There's a script at misc/measure.py that repeatedly runs a command like
+the above (to address variance) and summarizes its runtime.  E.g.::
+
+  path/to/misc/measure.py path/to/my/ninja chrome
+
+For changing the depfile parser, you can also build `parser_perftest`
+and run that directly on some representative input files.
+
+
+How to successfully make changes to Ninja
+..........................................
+
+Github pull requests are convenient for me to merge (I can just click
+a button and it's all handled server-side), but I'm also comfortable
+accepting pre-github git patches (via `send-email` etc.).
+
+Good pull requests have all of these attributes:
+
+* Are scoped to one specific issue
+* Include a test to demonstrate their correctness
+* Update the docs where relevant
+* Match the Ninja coding style (see below)
+* Don't include a mess of "oops, fix typo" commits
+
+These are typically merged without hesitation.  If a change is lacking
+any of the above I usually will ask you to fix it, though there are
+obvious exceptions (fixing typos in comments don't need tests).
+
+I am very wary of changes that increase the complexity of Ninja (in
+particular, new build file syntax or command-line flags) or increase
+the maintenance burden of Ninja.  Ninja is already successfully in use
+by hundreds of developers for large projects and it already achieves
+(most of) the goals I set out for it to do.  It's probably best to
+discuss new feature ideas on the mailing list_ before I shoot down your
+patch.
+
+.. _list: http://groups.google.com/group/ninja-build
+
+
+Generally it's the `Google C++ coding style`_, but in brief:
+.............................................................
+
+* Function name are camelcase.
+* Member methods are camelcase, expect for trivial getters which are
   underscore separated.
-- Local variables are underscore separated.
-- Member variables are underscore separated and suffixed by an extra underscore.
-- Two spaces indentation.
-- Opening braces is at the end of line.
-- Lines are 80 columns maximum.
-- All source files should have the Google Inc. license header.
-- Also follow this style:
-  http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
+* Local variables are underscore separated.
+* Member variables are underscore separated and suffixed by an extra
+  underscore.
+* Two spaces indentation.
+* Opening braces is at the end of line.
+* Lines are 80 columns maximum.
+* All source files should have the Google Inc. license header.
 
-Documentation guidelines:
--------------------------
+.. _`Google C++ coding style`: http://google-styleguide.googlecode.com/svn/trunk/cppguide.xml
 
-- Use /// for `doxygen`_.
-- Use \a to refer to arguments.
-- It's not necessary to document each argument, especially when they're
-  relatively self-evident (e.g. in CanonicalizePath(string* path, string* err),
+
+Documentation
+-------------
+
+Style guidelines
+................
+
+* Use `///` for doxygen.
+* Use `\a` to refer to arguments.
+* It's not necessary to document each argument, especially when they're
+  relatively self-evident (e.g. in `CanonicalizePath(string* path, string* err)`,
   the arguments are hopefully obvious)
 
-Build docu::
-
-    sudo apt-get install doxygen
-    ./ninja doxygen
-
-Generating the manual:
------------------------
+Building the manual
+...................
 
 You need `asciidoc`_ to do it::
 
   sudo apt-get install asciidoc --no-install-recommends
   ./ninja manual
 
-Windows development on Linux (this is kind of hacky right now):
----------------------------------------------------------------
+
+Building the code documentation
+...............................
+
+You need `doxygen`_ to do it::
+
+    sudo apt-get install doxygen
+    ./ninja doxygen
+
+
+Windows development on Linux / Mac OS X
+----------------------------------------
 
 - Get the `gtest`_ source, unpack it into your source dir::
 
@@ -138,12 +185,13 @@ Windows development on Linux (this is kind of hacky right now):
 
 - Build ninja::
 
-    /path/to/linux/ninja
+    /path/to/host/ninja
 
 - Run: ./ninja.exe  (implicitly runs through `wine`_ **(!)** )
 
-Windows development on Windows:
--------------------------------
+
+Windows development on Windows (this is kind of hacky right now)
+-----------------------------------------------------------------
 
 - install `mingw`_, `msys`_, and `python`_
 - in the mingw shell, put Python in your path, and: `python bootstrap.py`
@@ -152,12 +200,14 @@ Windows development on Windows:
 - you'll need to rename `ninja.exe` into `my-ninja.exe` during development,
   otherwise ninja won't be able to overwrite itself when building
 
-Using `clang`_:
+
+Using `clang`_
 ---------------
 
 - Enable colors manually::
 
     CXX='/path/to/llvm/Release+Asserts/bin/clang++ -fcolor-diagnostics' ./configure.py
+
 
 Using Ninja with an IDE:
 ------------------------
@@ -172,7 +222,16 @@ in **Eclipse**, **NetBeans**, or **Visual Studio 2005**.
             - 'KDevelop3 - Ninja'
             - 'CodeBlocks - Ninja'
 
-Or you may always use a Makefile "stub" and import your project as a **Makefile
+There is a `CMakeLists.txt` available which can be used to simply create a
+project file to develop on ninja::
+
+    cd build && \
+        cmake -G "Eclipse CDT4 - Ninja" -DCMAKE_MAKE_PROGRAM:STRING="${PWD}/ninja" \
+        -DCMAKE_CXX_COMPILER:FILEPATH="/opt/local/bin/g++" -Dgtest="${PWD}/gtest-1.6.0" .. && \
+        ../ninja && ../ninja package
+
+
+But you may always use a Makefile "stub" and import your project as a **Makefile
 based project**. Use a Makefile like this:
 
 .. include:: .Makefile

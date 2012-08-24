@@ -24,7 +24,7 @@ build systems in two major respects:
             only 1s while dependency checking.
           - It contains a *GNUmakefile* and a *CMakeLists.txt* if you like to
             work `Using Ninja with an IDE:`_
-          - `ninja -V` show you a distinguish version number if you build it
+          - `ninja --version` show you a distinguish version number if you build it
             yourself from develop branch.
           - My *Nina* home page is http://clausklein.github.com/ninja/
           - My *Nina* git repo is https://github.com/ClausKlein/ninja/
