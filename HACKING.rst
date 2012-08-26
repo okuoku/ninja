@@ -226,9 +226,9 @@ There is a `CMakeLists.txt` available which can be used to simply create a
 project file to develop on ninja::
 
     cd build && \
-        cmake -G "Eclipse CDT4 - Ninja" -DCMAKE_MAKE_PROGRAM:STRING="${PWD}/ninja" \
+        cmake -G "Eclipse CDT4 - Ninja" -DCMAKE_MAKE_PROGRAM:STRING="ninja" \
         -DCMAKE_CXX_COMPILER:FILEPATH="/opt/local/bin/g++" -Dgtest="${PWD}/gtest-1.6.0" .. && \
-        ../ninja && ../ninja package
+        ninja && ninja package
 
 
 But you may always use a Makefile "stub" and import your project as a **Makefile

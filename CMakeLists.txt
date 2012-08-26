@@ -14,7 +14,7 @@
 #
 #
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.9)
 
 if(ninja_srcdir)
     set(srcdir ${ninja_srcdir}/src)
@@ -112,7 +112,7 @@ if(CCACHE_EXECUTABLE AND NOT windows)
     endif()
     ### set(CMAKE_C_COMPILER ${CCACHE_EXECUTABLE})
     ### set(CMAKE_C_COMPILER_ARG1 ${GCC_EXECUTABLE})
-    ###FIXME set(CMAKE_CXX_COMPILER "${CCACHE_EXECUTABLE}")
+    ###XXX it seems to be better to use ARG1 below! ck set(CMAKE_CXX_COMPILER "${CCACHE_EXECUTABLE}")
     set(CMAKE_CXX_COMPILER "${CCACHE_EXECUTABLE}" CACHE PATH "" FORCE)
     set(CMAKE_CXX_COMPILER_ARG1 ${compiler})
 endif()
@@ -269,7 +269,7 @@ install_targets(/bin ninja)
 # Tests, gtest should be the path to gtest sources
 #
 if(gtest)
-    enable_testing()
+    enable_testing()    # ctest
 
     # Find the directory containing the file
     find_path(GTEST_INCLUDE_DIR "gtest/gtest.h" HINTS "${gtest}/include" CMAKE_FIND_ROOT_PATH_BOTH)
@@ -295,13 +295,14 @@ if(gtest)
         add_executable(${test_name} ${test_sources} ${ninja_h})
         target_link_libraries(${test_name} testlib ninja_lib ${platformlibs})
         set_test_cflags(${test_name})
+        add_test(NAME ${test_name} COMMAND ${test_name} CMakeFiles/ninja.dir/src/ninja.cc.o.d)    # ctest
         message(STATUS "Adding test '${test_name}'.")
     endmacro()
 
     # find all tests in src/
-    ###FIXME win32 only: src/msvc_helper_test.cc src/includes_normalize_test.cc
-    ###FIXME file(GLOB ninja_test_sources ${srcdir}/*_test.cc)
-    set(ninja_test_sources 
+    ###XXX win32 only: src/msvc_helper_test.cc src/includes_normalize_test.cc
+    ###NO! file(GLOB ninja_test_sources ${srcdir}/*_test.cc)
+    set(ninja_test_sources
         src/build_log_test.cc
         src/build_test.cc
         src/clean_test.cc
@@ -318,20 +319,19 @@ if(gtest)
 
     if(monolithic-test)
         add_ninja_test(ninja_test ${ninja_test_sources})
-        add_test(NAME ninja_test COMMAND ninja_test)
     else()
         foreach(it ${ninja_test_sources})
             get_filename_component(file_name ${it} NAME_WE)
-            if (NOT "msvc_helper_test.cc" EQUAL ${file_name}) 
+            if (NOT "msvc_helper_test.cc" EQUAL ${file_name})
                 set(test_name tst_${file_name})
                 add_ninja_test(${test_name} ${it})
-                add_test(NAME ${test_name} COMMAND ${test_name})
             endif()
         endforeach()
     endif()
 
-    # not added as test because it breaks 'make test'
     add_ninja_test(parser_perftest ${srcdir}/parser_perftest.cc)
+    add_ninja_test(build_log_perftest ${srcdir}/build_log_perftest.cc)
+    add_ninja_test(canon_perftest ${srcdir}/canon_perftest.cc)
 endif()
 
 

@@ -85,14 +85,14 @@ Contributing
 =============
 
 If you want to work with code, you should use `git-flow`_ .
-Fork the my git repository. Then, run::
+Fork my git repository. Then, run::
 
     git clone --recursive git@github.com:<username>/ninja.git
     git branch develop origin/develop
     git flow init -d
     git flow feature start <your feature>
 
-Then, do work and commit your changes::
+Then, after develop and testing your work, commit your changes::
 
     git flow feature publish <your feature>
 
