@@ -36,7 +36,7 @@
 
 #if defined(__APPLE__) || defined(__FreeBSD__)
 #include <sys/sysctl.h>
-#elif defined(linux)
+#elif defined(linux) || defined(__CYGWIN__)
 #include <sys/sysinfo.h>
 #endif
 
@@ -341,6 +341,10 @@ int GetProcessorCount() {
   SYSTEM_INFO info;
   GetSystemInfo(&info);
   return info.dwNumberOfProcessors;
+}
+#elif defined(__CYGWIN__)
+int GetProcessorCount () {
+  return get_nprocs();
 }
 #endif
 
